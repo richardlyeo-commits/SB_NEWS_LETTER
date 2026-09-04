@@ -241,13 +241,20 @@
             }
         }
 
-        // 파일명의 YYYY-MM-DD 포맷을 기준으로 카드 묶음 처리
+        // 유연한 날짜 추출 (2025.8.24, 2025-08-24, 20250824 모두 지원)
         function groupImagesByDate(files) {
             const groups = {};
 
             files.forEach(file => {
-                const match = file.name.match(/(20\d{2})[-._]?([01]\d)[-._]?([03]\d)/);
-                const rawDate = match ? `${match[1]}-${match[2]}-${match[3]}` : '기타';
+                const match = file.name.match(/(20\d{2})[-._]?([01]?\d)[-._]?([0-3]?\d)/);
+                let rawDate = '기타';
+
+                if (match) {
+                    const y = match[1];
+                    const m = match[2].padStart(2, '0');
+                    const d = match[3].padStart(2, '0');
+                    rawDate = `${y}-${m}-${d}`;
+                }
 
                 if (!groups[rawDate]) {
                     groups[rawDate] = [];
