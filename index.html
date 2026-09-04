@@ -35,12 +35,12 @@
 
         .input-grid {
             display: grid;
-            grid-template-columns: 180px 1fr auto;
+            grid-template-columns: 1fr auto;
             gap: 12px;
             align-items: center;
         }
 
-        .input-grid input[type="date"], .input-grid input[type="file"] {
+        .input-grid input[type="file"] {
             padding: 10px 14px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
@@ -239,7 +239,6 @@
         <div class="admin-panel">
             <h2>➕ 신규 주간 소식지 등록</h2>
             <div class="input-grid">
-                <input type="date" id="news-date">
                 <input type="file" id="news-files" accept="image/*" multiple>
                 <button class="btn-submit" onclick="addNewsletter()">등록하기</button>
             </div>
@@ -268,13 +267,19 @@
         let newsletters = [];
 
         window.onload = function() {
-            // 오늘 날짜 설정
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('news-date').value = today;
-            
             // 저장된 소식지 불러오기
             loadNewsletters();
         };
+
+        // 파일명에서 YYYY-MM-DD 추출하는 정규표현식 함수
+        function extractDateFromFilename(filename) {
+            const match = filename.match(/(20\d{2})[-._]?([01]\d)[-._]?([03]\d)/);
+            if (match) {
+                return `${match[1]}-${match[2]}-${match[3]}`;
+            }
+            // 날짜 패턴이 없을 경우 오늘 날짜로 지정
+            return new Date().toISOString().split('T')[0];
+        }
 
         function formatDateWithDay(dateString) {
             if (!dateString) return '';
@@ -305,19 +310,18 @@
         }
 
         function addNewsletter() {
-            const dateVal = document.getElementById('news-date').value;
             const fileInput = document.getElementById('news-files');
 
-            if (!dateVal) {
-                alert("발행일자를 선택해 주세요.");
-                return;
-            }
             if (!fileInput.files || fileInput.files.length === 0) {
                 alert("소식지 이미지 파일을 선택해 주세요.");
                 return;
             }
 
             const files = Array.from(fileInput.files);
+            
+            // 첫 번째 파일명에서 날짜 자동 추출
+            const extractedDate = extractDateFromFilename(files[0].name);
+
             const imageUrls = [];
             let loadedCount = 0;
 
@@ -330,11 +334,11 @@
                     if (loadedCount === files.length) {
                         const newItem = {
                             id: Date.now(),
-                            dateVal: dateVal,
-                            formattedDate: formatDateWithDay(dateVal),
+                            rawDate: extractedDate, // 정렬용 순수 날짜 (YYYY-MM-DD)
+                            formattedDate: formatDateWithDay(extractedDate),
                             images: imageUrls
                         };
-                        newsletters.unshift(newItem); // 최신순 배치
+                        newsletters.push(newItem);
                         saveNewsletters();
                         renderGrid();
                         fileInput.value = '';
@@ -344,7 +348,10 @@
             });
         }
 
+        // 핵심: rawDate 기준 내림차순(최신순) 정렬 후 출력
         function renderGrid() {
+            newsletters.sort((a, b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
+
             const grid = document.getElementById('card-grid');
             grid.innerHTML = '';
 
