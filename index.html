@@ -16,12 +16,14 @@
 
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* 상단 헤더 & 로그인 영역 */
+        /* 상단 헤더 */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .site-title {
@@ -30,68 +32,7 @@
             color: #0f172a;
         }
 
-        .btn-auth {
-            background-color: #334155;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-auth:hover { background-color: #1e293b; }
-
-        /* 1. 상단 신규 등록 패널 (관리자 전용) */
-        .admin-panel {
-            display: none; /* 기본 상태: 숨김 */
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            border: 2px solid #2563eb;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            margin-bottom: 32px;
-        }
-
-        .admin-panel h2 {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            color: #1e293b;
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .input-grid input[type="file"] {
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 14px;
-            background-color: #fff;
-        }
-
-        .btn-submit {
-            background-color: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-submit:hover { background-color: #1d4ed8; }
-
-        /* 2. 메인 썸네일 카드 목록 */
+        /* 메인 썸네일 카드 목록 */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -116,9 +57,6 @@
         }
 
         .card-top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 10px;
             padding-bottom: 8px;
             border-bottom: 1px solid #f1f5f9;
@@ -129,19 +67,6 @@
             font-size: 15px;
             color: #1e293b;
         }
-
-        .card-actions { display: none; gap: 4px; } /* 관리자만 노출 */
-
-        .btn-icon {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 3px 6px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .btn-icon:hover { background: #e2e8f0; }
 
         .thumb-wrapper {
             width: 100%;
@@ -175,7 +100,7 @@
 
         .btn-view:hover { background-color: #dbeafe; }
 
-        /* 3. 전체 화면 보기 팝업 (모달) */
+        /* 전체 화면 보기 팝업 (모달) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -244,8 +169,16 @@
 
         .btn-print:hover { background-color: #047857; }
 
+        .empty-msg {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
         @media print {
-            .top-bar, .admin-panel, .card-actions, .modal-close, .btn-print { display: none !important; }
+            .top-bar, .modal-close, .btn-print { display: none !important; }
             body { background: white; padding: 0; }
             .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
             .modal-content { box-shadow: none; padding: 0; border: none; }
@@ -258,16 +191,6 @@
         <!-- 상단 바 -->
         <div class="top-bar">
             <h1 class="site-title">📰 발행 소식지 목록</h1>
-            <button id="auth-btn" class="btn-auth" onclick="toggleAdmin()">🔒 관리자 로그인</button>
-        </div>
-
-        <!-- 관리자 전용 등록 영역 -->
-        <div id="admin-panel" class="admin-panel">
-            <h2>➕ 신규 주간 소식지 등록</h2>
-            <div class="input-grid">
-                <input type="file" id="news-files" accept="image/*" multiple>
-                <button class="btn-submit" onclick="addNewsletter()">등록하기</button>
-            </div>
         </div>
 
         <!-- 카드 목록 영역 -->
@@ -287,62 +210,71 @@
     </div>
 
     <script>
-        // 관리자 비밀번호 설정 (원하는 비밀번호로 변경하세요)
-        const ADMIN_PASSWORD = "1077";
-        let isAdmin = false;
-        let newsletters = [];
+        const GITHUB_USER = "richardlyeo-commits";
+        const REPO_NAME = "SB_NEWS_LETTER";
+
+        let newsGroupList = [];
 
         window.onload = function() {
-            loadNewsletters();
+            fetchRepoFiles();
         };
 
-        // 관리자 로그인 / 로그아웃 토글
-        function toggleAdmin() {
-            if (isAdmin) {
-                isAdmin = false;
-                alert("로그아웃 되었습니다.");
-                updateAdminUI();
-            } else {
-                const inputPw = prompt("관리자 비밀번호를 입력하세요:");
-                if (inputPw === ADMIN_PASSWORD) {
-                    isAdmin = true;
-                    alert("성공적으로 로그인되었습니다.");
-                    updateAdminUI();
-                } else if (inputPw !== null) {
-                    alert("비밀번호가 일치하지 않습니다.");
+        // GitHub API로 저장소의 이미지 파일 목록 자동 로드
+        async function fetchRepoFiles() {
+            const grid = document.getElementById('card-grid');
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/`);
+                if (!response.ok) throw new Error("파일 목록 불러오기 실패");
+                
+                const files = await response.json();
+                
+                const imageFiles = files.filter(file => {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    return ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
+                });
+
+                groupImagesByDate(imageFiles);
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div class="empty-msg">등록된 소식지 이미지 파일이 없습니다.<br>GitHub 저장소에 사진 파일을 올려주세요.</div>';
+            }
+        }
+
+        // 파일명의 YYYY-MM-DD 포맷을 기준으로 카드 묶음 처리
+        function groupImagesByDate(files) {
+            const groups = {};
+
+            files.forEach(file => {
+                const match = file.name.match(/(20\d{2})[-._]?([01]\d)[-._]?([03]\d)/);
+                const rawDate = match ? `${match[1]}-${match[2]}-${match[3]}` : '기타';
+
+                if (!groups[rawDate]) {
+                    groups[rawDate] = [];
                 }
-            }
-        }
+                groups[rawDate].push(file);
+            });
 
-        // 로그인 상태에 따른 화면 제어
-        function updateAdminUI() {
-            const adminPanel = document.getElementById('admin-panel');
-            const authBtn = document.getElementById('auth-btn');
-            const actionBtns = document.querySelectorAll('.card-actions');
+            const sortedDates = Object.keys(groups).sort((a, b) => {
+                if (a === '기타') return 1;
+                if (b === '기타') return -1;
+                return new Date(b) - new Date(a);
+            });
 
-            if (isAdmin) {
-                adminPanel.style.display = 'block';
-                authBtn.innerText = "🔓 관리자 로그아웃";
-                authBtn.style.backgroundColor = "#dc2626";
-                actionBtns.forEach(el => el.style.display = 'flex');
-            } else {
-                adminPanel.style.display = 'none';
-                authBtn.innerText = "🔒 관리자 로그인";
-                authBtn.style.backgroundColor = "#334155";
-                actionBtns.forEach(el => el.style.display = 'none');
-            }
-        }
+            newsGroupList = sortedDates.map((dateStr, idx) => {
+                groups[dateStr].sort((a, b) => a.name.localeCompare(b.name));
+                return {
+                    id: idx,
+                    rawDate: dateStr,
+                    formattedDate: dateStr !== '기타' ? formatDateWithDay(dateStr) : '기타 소식지',
+                    images: groups[dateStr].map(f => f.download_url)
+                };
+            });
 
-        function extractDateFromFilename(filename) {
-            const match = filename.match(/(20\d{2})[-._]?([01]\d)[-._]?([03]\d)/);
-            if (match) {
-                return `${match[1]}-${match[2]}-${match[3]}`;
-            }
-            return new Date().toISOString().split('T')[0];
+            renderGrid();
         }
 
         function formatDateWithDay(dateString) {
-            if (!dateString) return '';
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             const date = new Date(dateString + 'T00:00:00');
             const y = date.getFullYear();
@@ -352,80 +284,21 @@
             return `${y}.${m}.${d}(${dayName})`;
         }
 
-        function loadNewsletters() {
-            const saved = localStorage.getItem('weekly_newsletters');
-            if (saved) {
-                newsletters = JSON.parse(saved);
-                renderGrid();
-            }
-        }
-
-        function saveNewsletters() {
-            try {
-                localStorage.setItem('weekly_newsletters', JSON.stringify(newsletters));
-            } catch (e) {
-                alert("이미지 용량이 브라우저 저장 한도를 초과했습니다. 이미지 파일 용량을 줄여서 올려주세요.");
-            }
-        }
-
-        function addNewsletter() {
-            if (!isAdmin) {
-                alert("권한이 없습니다.");
-                return;
-            }
-
-            const fileInput = document.getElementById('news-files');
-
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("소식지 이미지 파일을 선택해 주세요.");
-                return;
-            }
-
-            const files = Array.from(fileInput.files);
-            const extractedDate = extractDateFromFilename(files[0].name);
-
-            const imageUrls = [];
-            let loadedCount = 0;
-
-            files.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imageUrls[index] = e.target.result;
-                    loadedCount++;
-
-                    if (loadedCount === files.length) {
-                        const newItem = {
-                            id: Date.now(),
-                            rawDate: extractedDate,
-                            formattedDate: formatDateWithDay(extractedDate),
-                            images: imageUrls
-                        };
-                        newsletters.push(newItem);
-                        saveNewsletters();
-                        renderGrid();
-                        fileInput.value = '';
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
         function renderGrid() {
-            newsletters.sort((a, b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
-
             const grid = document.getElementById('card-grid');
             grid.innerHTML = '';
 
-            newsletters.forEach(item => {
+            if (newsGroupList.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">등록된 소식지 이미지 파일이 없습니다.<br>GitHub 저장소에 사진 파일을 올려주세요.</div>';
+                return;
+            }
+
+            newsGroupList.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'news-card';
                 card.innerHTML = `
                     <div class="card-top-header">
                         <span class="card-date">🗓️ ${item.formattedDate}</span>
-                        <div class="card-actions">
-                            <button class="btn-icon" onclick="editDate(${item.id})">✏️</button>
-                            <button class="btn-icon" onclick="deleteCard(${item.id})">🗑️</button>
-                        </div>
                     </div>
                     <div class="thumb-wrapper" onclick="openModal(${item.id})">
                         <img src="${item.images[0]}" class="thumb-img" alt="${item.formattedDate} 소식지">
@@ -434,35 +307,10 @@
                 `;
                 grid.appendChild(card);
             });
-
-            // 관리자 권한 상태 반영
-            updateAdminUI();
-        }
-
-        function editDate(id) {
-            if (!isAdmin) return;
-            const item = newsletters.find(n => n.id === id);
-            if (!item) return;
-
-            const newDate = prompt("수정할 날짜를 입력하세요 (예: 2026.09.04):", item.formattedDate);
-            if (newDate && newDate.trim() !== "") {
-                item.formattedDate = newDate.trim();
-                saveNewsletters();
-                renderGrid();
-            }
-        }
-
-        function deleteCard(id) {
-            if (!isAdmin) return;
-            if (confirm("이 소식지를 삭제하시겠습니까?")) {
-                newsletters = newsletters.filter(n => n.id !== id);
-                saveNewsletters();
-                renderGrid();
-            }
         }
 
         function openModal(id) {
-            const item = newsletters.find(n => n.id === id);
+            const item = newsGroupList.find(n => n.id === id);
             if (!item) return;
 
             document.getElementById('modal-title').innerText = `${item.formattedDate} 주간 소식지`;
