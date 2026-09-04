@@ -16,12 +16,41 @@
 
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* 1. 상단 신규 등록 패널 (관리자 영역) */
+        /* 상단 헤더 & 로그인 영역 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .site-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .btn-auth {
+            background-color: #334155;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-auth:hover { background-color: #1e293b; }
+
+        /* 1. 상단 신규 등록 패널 (관리자 전용) */
         .admin-panel {
+            display: none; /* 기본 상태: 숨김 */
             background: #ffffff;
             padding: 24px;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #2563eb;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             margin-bottom: 32px;
         }
@@ -63,15 +92,6 @@
         .btn-submit:hover { background-color: #1d4ed8; }
 
         /* 2. 메인 썸네일 카드 목록 */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-title { font-size: 22px; font-weight: 800; color: #0f172a; }
-
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -110,7 +130,7 @@
             color: #1e293b;
         }
 
-        .card-actions { display: flex; gap: 4px; }
+        .card-actions { display: none; gap: 4px; } /* 관리자만 노출 */
 
         .btn-icon {
             background: #f1f5f9;
@@ -225,7 +245,7 @@
         .btn-print:hover { background-color: #047857; }
 
         @media print {
-            .admin-panel, .section-header, .card-actions, .modal-close, .btn-print { display: none !important; }
+            .top-bar, .admin-panel, .card-actions, .modal-close, .btn-print { display: none !important; }
             body { background: white; padding: 0; }
             .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
             .modal-content { box-shadow: none; padding: 0; border: none; }
@@ -235,8 +255,14 @@
 <body>
 
     <div class="container">
-        <!-- 관리자 등록 영역 -->
-        <div class="admin-panel">
+        <!-- 상단 바 -->
+        <div class="top-bar">
+            <h1 class="site-title">📰 발행 소식지 목록</h1>
+            <button id="auth-btn" class="btn-auth" onclick="toggleAdmin()">🔒 관리자 로그인</button>
+        </div>
+
+        <!-- 관리자 전용 등록 영역 -->
+        <div id="admin-panel" class="admin-panel">
             <h2>➕ 신규 주간 소식지 등록</h2>
             <div class="input-grid">
                 <input type="file" id="news-files" accept="image/*" multiple>
@@ -245,9 +271,6 @@
         </div>
 
         <!-- 카드 목록 영역 -->
-        <div class="section-header">
-            <div class="section-title">📰 발행 소식지 목록</div>
-        </div>
         <div id="card-grid" class="card-grid"></div>
     </div>
 
@@ -264,20 +287,57 @@
     </div>
 
     <script>
+        // 관리자 비밀번호 설정 (원하는 비밀번호로 변경하세요)
+        const ADMIN_PASSWORD = "1234";
+        let isAdmin = false;
         let newsletters = [];
 
         window.onload = function() {
-            // 저장된 소식지 불러오기
             loadNewsletters();
         };
 
-        // 파일명에서 YYYY-MM-DD 추출하는 정규표현식 함수
+        // 관리자 로그인 / 로그아웃 토글
+        function toggleAdmin() {
+            if (isAdmin) {
+                isAdmin = false;
+                alert("로그아웃 되었습니다.");
+                updateAdminUI();
+            } else {
+                const inputPw = prompt("관리자 비밀번호를 입력하세요:");
+                if (inputPw === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    alert("성공적으로 로그인되었습니다.");
+                    updateAdminUI();
+                } else if (inputPw !== null) {
+                    alert("비밀번호가 일치하지 않습니다.");
+                }
+            }
+        }
+
+        // 로그인 상태에 따른 화면 제어
+        function updateAdminUI() {
+            const adminPanel = document.getElementById('admin-panel');
+            const authBtn = document.getElementById('auth-btn');
+            const actionBtns = document.querySelectorAll('.card-actions');
+
+            if (isAdmin) {
+                adminPanel.style.display = 'block';
+                authBtn.innerText = "🔓 관리자 로그아웃";
+                authBtn.style.backgroundColor = "#dc2626";
+                actionBtns.forEach(el => el.style.display = 'flex');
+            } else {
+                adminPanel.style.display = 'none';
+                authBtn.innerText = "🔒 관리자 로그인";
+                authBtn.style.backgroundColor = "#334155";
+                actionBtns.forEach(el => el.style.display = 'none');
+            }
+        }
+
         function extractDateFromFilename(filename) {
             const match = filename.match(/(20\d{2})[-._]?([01]\d)[-._]?([03]\d)/);
             if (match) {
                 return `${match[1]}-${match[2]}-${match[3]}`;
             }
-            // 날짜 패턴이 없을 경우 오늘 날짜로 지정
             return new Date().toISOString().split('T')[0];
         }
 
@@ -292,7 +352,6 @@
             return `${y}.${m}.${d}(${dayName})`;
         }
 
-        // 브라우저 저장소(LocalStorage) 연동
         function loadNewsletters() {
             const saved = localStorage.getItem('weekly_newsletters');
             if (saved) {
@@ -305,11 +364,16 @@
             try {
                 localStorage.setItem('weekly_newsletters', JSON.stringify(newsletters));
             } catch (e) {
-                alert("이미지 용량이 너무 커서 브라우저 저장소 용량을 초과했습니다. 이미지 파일 용량을 줄인 후 다시 시도해 주세요.");
+                alert("이미지 용량이 브라우저 저장 한도를 초과했습니다. 이미지 파일 용량을 줄여서 올려주세요.");
             }
         }
 
         function addNewsletter() {
+            if (!isAdmin) {
+                alert("권한이 없습니다.");
+                return;
+            }
+
             const fileInput = document.getElementById('news-files');
 
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -318,8 +382,6 @@
             }
 
             const files = Array.from(fileInput.files);
-            
-            // 첫 번째 파일명에서 날짜 자동 추출
             const extractedDate = extractDateFromFilename(files[0].name);
 
             const imageUrls = [];
@@ -334,7 +396,7 @@
                     if (loadedCount === files.length) {
                         const newItem = {
                             id: Date.now(),
-                            rawDate: extractedDate, // 정렬용 순수 날짜 (YYYY-MM-DD)
+                            rawDate: extractedDate,
                             formattedDate: formatDateWithDay(extractedDate),
                             images: imageUrls
                         };
@@ -348,7 +410,6 @@
             });
         }
 
-        // 핵심: rawDate 기준 내림차순(최신순) 정렬 후 출력
         function renderGrid() {
             newsletters.sort((a, b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
 
@@ -373,13 +434,17 @@
                 `;
                 grid.appendChild(card);
             });
+
+            // 관리자 권한 상태 반영
+            updateAdminUI();
         }
 
         function editDate(id) {
+            if (!isAdmin) return;
             const item = newsletters.find(n => n.id === id);
             if (!item) return;
 
-            const newDate = prompt("수정할 날짜를 입력하세요 (예: 2026.09.04):", item.formattedDate.replace('🗓️ ', ''));
+            const newDate = prompt("수정할 날짜를 입력하세요 (예: 2026.09.04):", item.formattedDate);
             if (newDate && newDate.trim() !== "") {
                 item.formattedDate = newDate.trim();
                 saveNewsletters();
@@ -388,6 +453,7 @@
         }
 
         function deleteCard(id) {
+            if (!isAdmin) return;
             if (confirm("이 소식지를 삭제하시겠습니까?")) {
                 newsletters = newsletters.filter(n => n.id !== id);
                 saveNewsletters();
