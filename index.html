@@ -50,6 +50,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            cursor: pointer; /* 카드 전체 클릭 가능 표시 */
         }
 
         .news-card:hover {
@@ -65,7 +66,6 @@
             border-radius: 6px;
             overflow: hidden;
             border: 1px solid #f1f5f9;
-            cursor: pointer;
             background-color: #f8fafc;
             margin-bottom: 8px;
         }
@@ -76,12 +76,12 @@
             object-fit: cover;
         }
 
-        /* 하단 정보 (날짜만 강조) */
+        /* 하단 정보 (날짜 및 요약글) */
         .card-info {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .card-title {
@@ -92,20 +92,17 @@
             word-break: keep-all;
         }
 
-        .btn-view {
-            width: 100%;
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            padding: 6px 0;
+        /* 소식지 요약 텍스트 (보기 버튼 대체) */
+        .card-summary {
             font-size: 11px;
-            font-weight: 700;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
+            color: #64748b;
+            line-height: 1.3;
+            word-break: keep-all;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 최대 2줄까지만 표시 후 ... 처리 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-
-        .btn-view:hover { background-color: #dbeafe; }
 
         /* 모달 팝업 */
         .modal-overlay {
@@ -196,9 +193,8 @@
             .card-title {
                 font-size: 11px;
             }
-            .btn-view {
+            .card-summary {
                 font-size: 10px;
-                padding: 4px 0;
             }
         }
 
@@ -288,7 +284,9 @@
             const sortedDates = Object.keys(groups).sort((a, b) => {
                 if (a === '기타') return 1;
                 if (b === '기타') return -1;
-                return new Date(b) - new Date(a);
+                if (a < b) return 1;
+                if (a > b) return -1;
+                return 0;
             });
 
             newsGroupList = sortedDates.map((dateStr, idx) => {
@@ -326,13 +324,23 @@
             newsGroupList.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'news-card';
+                card.onclick = () => openModal(item.id); /* 카드 클릭 시 모달 열기 */
+
+                /* 소식지 날짜별 요약 문구 설정 */
+                let summaryText = "주간 주요 소식 및 안내사항";
+                if (item.formattedDate.includes("2026.06.15")) {
+                    summaryText = "월암영업소 차량가동 및 근태 보고";
+                } else if (item.formattedDate.includes("기타")) {
+                    summaryText = "사내 주요 소식 모음";
+                }
+
                 card.innerHTML = `
-                    <div class="thumb-wrapper" onclick="openModal(${item.id})">
+                    <div class="thumb-wrapper">
                         <img src="${item.images[0]}" class="thumb-img" alt="${item.formattedDate} 소식지">
                     </div>
                     <div class="card-info">
                         <div class="card-title">${item.formattedDate}</div>
-                        <button class="btn-view" onclick="openModal(${item.id})">📖 보기</button>
+                        <div class="card-summary">${summaryText}</div>
                     </div>
                 `;
                 grid.appendChild(card);
