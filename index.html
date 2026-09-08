@@ -2,9 +2,10 @@
 <!--
     ==================================================
     PROJECT: 삼영보영 주간 소식지 Web Viewer
-    VERSION: 20260908-8
+    VERSION: 20260908-9
     LAST UPDATED: 2026-09-08
     CHANGES: 
+    - 하단 페이지네이션(숫자 버튼) 기능 추가하여 지난 소식지 탐색 지원
     - 2장 이상 소식지 다중 이미지(갤러리 슬라이드) 연동 지원
     - Viewer.js 이전/다음 이동 버튼 및 하단 썸네일 바 활성화
     ==================================================
@@ -13,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (v20260908-8)</title>
+    <title>삼영보영 주간 소식지 (v20260908-9)</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Viewer.js CSS (이미지 줌) -->
@@ -245,6 +246,52 @@
             color: white;
         }
 
+        /* 🔢 Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 30px;
+            padding: 10px;
+        }
+
+        .page-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: 700;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -345,17 +392,17 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo-wrapper">
-                    <img src="logo.jpg?v=20260908-8" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+                    <img src="logo.jpg?v=20260908-9" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
                 </div>
                 <div class="brand-text">
-                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-8</span></h1>
+                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-9</span></h1>
                     <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
                 </div>
             </div>
             <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
         </div>
 
-        <!-- News Grid List (다중 이미지 쉼표 구분) -->
+        <!-- News Grid List -->
         <div class="news-grid" id="newsGrid">
             
             <div class="news-card" data-img="20260907_1.jpg">
@@ -447,6 +494,9 @@
             </div>
 
         </div>
+
+        <!-- 🔢 하단 페이지네이션 영억 -->
+        <div class="pagination" id="pagination"></div>
     </div>
 
     <!-- 작성 팝업 (Modal) -->
@@ -477,15 +527,92 @@
     <!-- Viewer.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        console.log("App Version: 20260908-8 Loaded");
+        console.log("App Version: 20260908-9 Loaded");
 
         const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
-        const ADMIN_PASSWORD = "1077";
+        const ADMIN_PASSWORD = "1234";
+
+        // ⚙️ 페이지네이션 설정
+        const ITEMS_PER_PAGE = 8; // 한 페이지당 보여줄 소식지 개수
+        let currentPage = 1;
+        let totalPages = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
             initViewer();
+            setupPagination();
             document.getElementById('newsDate').valueAsDate = new Date();
         });
+
+        // 🟢 페이지네이션 생성 및 관리 함수
+        function setupPagination() {
+            const cards = document.querySelectorAll('.news-card');
+            totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
+
+            showPage(1); // 기본 1페이지 표시
+        }
+
+        function showPage(page) {
+            currentPage = page;
+            const cards = document.querySelectorAll('.news-card');
+            const startIndex = (page - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+
+            // 소식지 카드 보이기 / 숨기기
+            cards.forEach((card, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            renderPaginationButtons();
+        }
+
+        function renderPaginationButtons() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            if (totalPages <= 1) return; // 1페이지 이하이면 페이지네이션 미표시
+
+            // 이전 페이지 버튼
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerText = '‹';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    showPage(currentPage - 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            paginationContainer.appendChild(prevBtn);
+
+            // 페이지 숫자 버튼들
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerText = i;
+                pageBtn.addEventListener('click', () => {
+                    showPage(i);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                paginationContainer.appendChild(pageBtn);
+            }
+
+            // 다음 페이지 버튼
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerText = '›';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    showPage(currentPage + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            paginationContainer.appendChild(nextBtn);
+        }
 
         function openModal() {
             const userInput = prompt("관리자 비밀번호를 입력해주세요:");
@@ -512,10 +639,8 @@
                         return;
                     }
 
-                    // 쉼표(,)로 구분된 파일명들을 배열로 분리
                     const imgList = imgData.split(',').map(item => item.trim());
 
-                    // Viewer.js 갤러리용 임시 컨테이너 생성
                     const container = document.createElement('div');
                     container.style.display = 'none';
 
@@ -527,17 +652,16 @@
 
                     document.body.appendChild(container);
 
-                    // 갤러리 슬라이드 모드로 뷰어 실행
                     const viewer = new Viewer(container, {
                         hidden() {
                             viewer.destroy();
-                            container.remove(); // 뷰어 닫을 때 임시 노드 삭제
+                            container.remove();
                         },
-                        navbar: true, // 하단 썸네일 네비게이션
+                        navbar: true,
                         title: false,
                         toolbar: {
                             zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1,
-                            prev: 1, next: 1, // 이전 / 다음장 이동 버튼
+                            prev: 1, next: 1,
                             rotateLeft: 1, rotateRight: 1, flipHorizontal: 0, flipVertical: 0
                         }
                     });
