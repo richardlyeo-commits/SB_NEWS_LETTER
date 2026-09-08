@@ -1,23 +1,12 @@
 <!DOCTYPE html>
-<!--
-    ==================================================
-    PROJECT: 삼영보영 주간 소식지 Web Viewer
-    VERSION: 20260908-9
-    LAST UPDATED: 2026-09-08
-    CHANGES: 
-    - 하단 페이지네이션(숫자 버튼) 기능 추가하여 지난 소식지 탐색 지원
-    - 2장 이상 소식지 다중 이미지(갤러리 슬라이드) 연동 지원
-    - Viewer.js 이전/다음 이동 버튼 및 하단 썸네일 바 활성화
-    ==================================================
--->
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (v20260908-9)</title>
+    <title>삼영보영 주간 소식지</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Viewer.js CSS (이미지 줌) -->
+    <!-- Viewer.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     
     <style>
@@ -49,7 +38,6 @@
             min-height: 100vh;
         }
 
-        /* 🖼️ 배경 은은한 레이어 */
         body::before {
             content: "";
             position: fixed;
@@ -119,18 +107,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .version-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            background: rgba(226, 232, 240, 0.55);
-            padding: 3px 8px;
-            border-radius: 20px;
-            letter-spacing: 0.2px;
-            font-family: -apple-system, BlinkMacSystemFont, monospace;
-            border: 1px solid rgba(203, 213, 225, 0.4);
         }
 
         .brand-text p {
@@ -246,7 +222,7 @@
             color: white;
         }
 
-        /* 🔢 Pagination Styles */
+        /* 🔢 Pagination UI */
         .pagination {
             display: flex;
             justify-content: center;
@@ -392,20 +368,20 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo-wrapper">
-                    <img src="logo.jpg?v=20260908-9" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+                    <img src="logo.jpg" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
                 </div>
                 <div class="brand-text">
-                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-9</span></h1>
+                    <h1>삼영보영 주간 소식지</h1>
                     <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
                 </div>
             </div>
             <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
         </div>
 
-        <!-- News Grid List -->
+        <!-- News Grid List (전체 소식지 파일 최신순) -->
         <div class="news-grid" id="newsGrid">
             
-            <div class="news-card" data-img="20260907_1.jpg">
+            <div class="news-card" data-img="20260907_1.jpg,20260907_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-09-07 <span class="badge-new">NEW</span></span>
                     <span class="card-title">9월 2주차 주간 소식지</span>
@@ -477,7 +453,15 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260713_1.jpg">
+            <div class="news-card" data-img="20260714_휠체어장애인 승차거부금지 공지문.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-14</span>
+                    <span class="card-title">휠체어 장애인 승차거부 금지 공지문</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260713_1.jpg,20260713_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-07-13</span>
                     <span class="card-title">7월 2주차 주간 소식지</span>
@@ -485,7 +469,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260706_1.jpg">
+            <div class="news-card" data-img="20260706_1.jpg,20260706_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-07-06</span>
                     <span class="card-title">7월 1주차 주간 소식지</span>
@@ -493,9 +477,201 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
+            <div class="news-card" data-img="20260630_중대과실.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-06-30</span>
+                    <span class="card-title">중대과실 사고 예방 공지문</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260629_1.jpg,20260629_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-06-29</span>
+                    <span class="card-title">6월 5주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260615_1.jpg,20260615_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-06-15</span>
+                    <span class="card-title">6월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260608_1.jpg,20260608_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-06-08</span>
+                    <span class="card-title">6월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260607_1.jpg,20260607_정류장질서문란.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-06-07</span>
+                    <span class="card-title">정류장 질서문란 행위 근절 공지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260525_1.jpg,20260525_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-05-25</span>
+                    <span class="card-title">5월 4주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260518_1.jpg,20260518_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-05-18</span>
+                    <span class="card-title">5월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260511_1.png,20260511_2.png">
+                <div class="card-info">
+                    <span class="date-badge">2026-05-11</span>
+                    <span class="card-title">5월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260504_1.jpg,20260504_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-05-04</span>
+                    <span class="card-title">5월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260420_1.jpg,20260420_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-04-20</span>
+                    <span class="card-title">4월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260416-운행질서 개선 공지문.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-04-16</span>
+                    <span class="card-title">운행질서 개선 공지문</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260413_1.jpg,20260413_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-04-13</span>
+                    <span class="card-title">4월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260406_1.jpg,20260406_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-04-06</span>
+                    <span class="card-title">4월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260330_1.jpg,20260330_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-03-30</span>
+                    <span class="card-title">3월 5주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260323_1.jpg,20260323_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-03-23</span>
+                    <span class="card-title">3월 4주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260316_1.jpg,20260316_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-03-16</span>
+                    <span class="card-title">3월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260309_1.jpg,20260309_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-03-09</span>
+                    <span class="card-title">3월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260303_1.jpg,20260303_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-03-03</span>
+                    <span class="card-title">3월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260216_1.jpg,20260216_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-02-16</span>
+                    <span class="card-title">2월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260202_1.jpg,20260202_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-02-02</span>
+                    <span class="card-title">2월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260126_1.jpg,20260126_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-01-26</span>
+                    <span class="card-title">1월 4주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260119_1.jpg,20260119_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-01-19</span>
+                    <span class="card-title">1월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260112_1.jpg,20260112_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-01-12</span>
+                    <span class="card-title">1월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260105_1.jpg,20260105_2.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-01-05</span>
+                    <span class="card-title">1월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
         </div>
 
-        <!-- 🔢 하단 페이지네이션 영억 -->
+        <!-- 🔢 하단 페이지네이션 영역 -->
         <div class="pagination" id="pagination"></div>
     </div>
 
@@ -516,8 +692,8 @@
                     <textarea id="newsTitle" class="form-control" placeholder="주요 소식 요약 문구를 입력하세요" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="newsFile">소식지 이미지 파일 (JPG, PNG)</label>
-                    <input type="file" id="newsFile" class="form-control" accept="image/*" required>
+                    <label for="newsFile">소식지 이미지 파일 (여러 장 선택 가능)</label>
+                    <input type="file" id="newsFile" class="form-control" accept="image/*" multiple required>
                 </div>
                 <button type="submit" class="btn-submit" id="submitBtn">소식지 등록하기</button>
             </form>
@@ -527,13 +703,11 @@
     <!-- Viewer.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        console.log("App Version: 20260908-9 Loaded");
-
         const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
         const ADMIN_PASSWORD = "1234";
 
-        // ⚙️ 페이지네이션 설정
-        const ITEMS_PER_PAGE = 8; // 한 페이지당 보여줄 소식지 개수
+        // ⚙️ 페이지네이션 설정 (한 페이지당 10개씩)
+        const ITEMS_PER_PAGE = 10;
         let currentPage = 1;
         let totalPages = 1;
 
@@ -543,12 +717,11 @@
             document.getElementById('newsDate').valueAsDate = new Date();
         });
 
-        // 🟢 페이지네이션 생성 및 관리 함수
+        // 🟢 페이지네이션 생성 및 화면 처리
         function setupPagination() {
             const cards = document.querySelectorAll('.news-card');
             totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
-
-            showPage(1); // 기본 1페이지 표시
+            showPage(1);
         }
 
         function showPage(page) {
@@ -557,7 +730,6 @@
             const startIndex = (page - 1) * ITEMS_PER_PAGE;
             const endIndex = startIndex + ITEMS_PER_PAGE;
 
-            // 소식지 카드 보이기 / 숨기기
             cards.forEach((card, index) => {
                 if (index >= startIndex && index < endIndex) {
                     card.style.display = 'flex';
@@ -573,9 +745,9 @@
             const paginationContainer = document.getElementById('pagination');
             paginationContainer.innerHTML = '';
 
-            if (totalPages <= 1) return; // 1페이지 이하이면 페이지네이션 미표시
+            if (totalPages <= 1) return;
 
-            // 이전 페이지 버튼
+            // 이전 버튼
             const prevBtn = document.createElement('button');
             prevBtn.className = 'page-btn';
             prevBtn.innerText = '‹';
@@ -588,7 +760,7 @@
             });
             paginationContainer.appendChild(prevBtn);
 
-            // 페이지 숫자 버튼들
+            // 숫자 버튼
             for (let i = 1; i <= totalPages; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
@@ -600,7 +772,7 @@
                 paginationContainer.appendChild(pageBtn);
             }
 
-            // 다음 페이지 버튼
+            // 다음 버튼
             const nextBtn = document.createElement('button');
             nextBtn.className = 'page-btn';
             nextBtn.innerText = '›';
@@ -628,7 +800,7 @@
             document.getElementById('addModal').style.display = 'none';
         }
 
-        // 🟢 다중 이미지 갤러리 지원 Viewer.js 초기화 함수
+        // 🟢 다중 이미지 viewer 연동
         function initViewer() {
             const cards = document.querySelectorAll('.news-card');
             cards.forEach(card => {
@@ -681,11 +853,12 @@
 
             if (fileInput.files.length === 0) return;
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
             submitBtn.disabled = true;
             submitBtn.innerText = "업로드 중...";
+
+            const fileNames = Array.from(fileInput.files).map(f => f.name).join(',');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
 
             reader.onload = async function() {
                 const base64Data = reader.result.split(',')[1];
@@ -693,7 +866,7 @@
                 const payload = {
                     date: date,
                     title: title,
-                    filename: file.name,
+                    filename: fileNames,
                     mimeType: file.type,
                     fileData: base64Data
                 };
