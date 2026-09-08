@@ -2,18 +2,17 @@
 <!--
     ==================================================
     PROJECT: 삼영보영 주간 소식지 Web Viewer
-    VERSION: 20260908-5
+    VERSION: 20260908-6
     LAST UPDATED: 2026-09-08
     CHANGES: 
-    - '+ 새 소식지 작성' 버튼 원래 위치(상단 우측)로 복원
-    - 버전 정보 배지 바탕색을 더욱 은은하고 부드럽게 조정
+    - 깃허브 루트 경로에 존재하는 실제 이미지 파일명 직접 연동
     ==================================================
 -->
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (v20260908-5)</title>
+    <title>삼영보영 주간 소식지 (v20260908-6)</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Viewer.js CSS (이미지 줌) -->
@@ -91,7 +90,6 @@
             gap: 18px;
         }
 
-        /* 🏷️ 자연스러운 로고 프레임 (부드러운 미세 그림자) */
         .brand-logo-wrapper {
             background: #ffffff;
             padding: 8px 14px;
@@ -103,7 +101,6 @@
             flex-shrink: 0;
         }
 
-        /* 🏷️ 로고 이미지 원본 그대로 표시 */
         .brand-logo {
             height: 44px;
             width: auto;
@@ -122,7 +119,6 @@
             gap: 8px;
         }
 
-        /* 🏷️ 한층 더 은은하고 부드러운 버젼 태그 */
         .version-tag {
             font-size: 0.7rem;
             font-weight: 600;
@@ -141,7 +137,6 @@
             margin-top: 3px;
         }
 
-        /* ➕ 상단 우측 원래 위치 작성 버튼 */
         .btn-add-modal {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
@@ -349,29 +344,36 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo-wrapper">
-                    <img src="logo.jpg?v=20260908-5" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+                    <img src="logo.jpg?v=20260908-6" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
                 </div>
                 <div class="brand-text">
-                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-5</span></h1>
+                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-6</span></h1>
                     <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
                 </div>
             </div>
-            <!-- 원래 우측 상단 위치 -->
             <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
         </div>
 
-        <!-- News Grid List -->
+        <!-- News Grid List (깃허브 루트의 실제 이미지 파일명 연동) -->
         <div class="news-grid" id="newsGrid">
             
-            <div class="news-card" data-img="https://picsum.photos/1200/1600?random=1">
+            <div class="news-card" data-img="20260907_1.jpg">
                 <div class="card-info">
-                    <span class="date-badge">2026-08-31 <span class="badge-new">NEW</span></span>
+                    <span class="date-badge">2026-09-07 <span class="badge-new">NEW</span></span>
+                    <span class="card-title">9월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260831_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-08-31</span>
                     <span class="card-title">전기버스 화재대비훈련·소급 급여명세서 교부 및 신호위반 예방</span>
                 </div>
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="https://picsum.photos/1200/1600?random=2">
+            <div class="news-card" data-img="20260824_1.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-24</span>
                     <span class="card-title">경기프리미엄 P9902 개통·8-2번 우회운행 및 쿨스카프 지급</span>
@@ -379,10 +381,42 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="https://picsum.photos/1200/1600?random=3">
+            <div class="news-card" data-img="20260817_1.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-17</span>
                     <span class="card-title">잠실역 환승센터 PSD 주의·운자가격증명 게시 및 폭염 온열질환 예방</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260810_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-08-10</span>
+                    <span class="card-title">8월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260803_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-08-03</span>
+                    <span class="card-title">8월 1주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260727_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-27</span>
+                    <span class="card-title">7월 4주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260720_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-20</span>
+                    <span class="card-title">7월 3주차 주간 소식지</span>
                 </div>
                 <div class="btn-view">🔍 보기</div>
             </div>
@@ -418,7 +452,7 @@
     <!-- Viewer.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        console.log("App Version: 20260908-5 Loaded");
+        console.log("App Version: 20260908-6 Loaded");
 
         const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
         const ADMIN_PASSWORD = "1234";
