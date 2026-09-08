@@ -16,7 +16,6 @@
 
         .container { max-width: 900px; margin: 0 auto; }
 
-        /* 상단 헤더 */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -32,7 +31,6 @@
             color: #0f172a;
         }
 
-        /* 그리드 레이아웃 (기본: PC 4개 / 모바일 2~3개) */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -59,7 +57,6 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
         }
 
-        /* 콤팩트 썸네일 영역 */
         .thumb-wrapper {
             width: 100%;
             aspect-ratio: 3 / 4;
@@ -76,7 +73,6 @@
             object-fit: cover;
         }
 
-        /* 하단 정보 (날짜 및 요약글) */
         .card-info {
             width: 100%;
             display: flex;
@@ -92,7 +88,6 @@
             word-break: keep-all;
         }
 
-        /* 소식지 요약 텍스트 (긴 파일명도 최대 2줄까지만 표시) */
         .card-summary {
             font-size: 11px;
             color: #64748b;
@@ -104,7 +99,6 @@
             overflow: hidden;
         }
 
-        /* 모달 팝업 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -181,21 +175,14 @@
             font-size: 14px;
         }
 
-        /* 스마트폰 전용 미세조정 */
         @media (max-width: 480px) {
             .card-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 8px;
             }
-            .news-card {
-                padding: 6px;
-            }
-            .card-title {
-                font-size: 11px;
-            }
-            .card-summary {
-                font-size: 10px;
-            }
+            .news-card { padding: 6px; }
+            .card-title { font-size: 11px; }
+            .card-summary { font-size: 10px; }
         }
 
         @media print {
@@ -209,16 +196,13 @@
 <body>
 
     <div class="container">
-        <!-- 상단 바 -->
         <div class="top-bar">
             <h1 class="site-title">📰 삼영보영 주간소식 목록</h1>
         </div>
 
-        <!-- 카드 목록 영역 -->
         <div id="card-grid" class="card-grid"></div>
     </div>
 
-    <!-- 모달 팝업 -->
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -234,7 +218,36 @@
         const GITHUB_USER = "richardlyeo-commits";
         const REPO_NAME = "SB_NEWS_LETTER";
 
+        /*
+           📌 주간 소식지 요약 인덱스
+           "YYYYMMDD" 또는 "YYYY-MM-DD" 형태로 자유롭게 입력하실 수 있습니다.
+        */
+        const NEWS_INDEX = {
+            "20260831": "8월 5주차 차량가동 및 근태 관리 안내",
+            "20260824": "8월 4주차 하계 안전운전 수칙 및 정비 점검",
+            "20260817": "8월 3주차 차량 정비 및 직무 안전 교육",
+            "20260810": "8월 2주차 주간 주요 소식 및 안내사항",
+            "20260803": "8월 1주차 영업소별 주요 소식"
+        };
+
         let newsGroupList = [];
+
+        // 날짜 규격화 (어떤 형식으로 입력되어도 YYYY-MM-DD로 통일)
+        function normalizeDateStr(str) {
+            if (!str) return '';
+            const cleaned = str.replace(/[^0-9]/g, '');
+            if (cleaned.length === 8) {
+                return `${cleaned.substring(0,4)}-${cleaned.substring(4,6)}-${cleaned.substring(6,8)}`;
+            }
+            return str;
+        }
+
+        // NEWS_INDEX의 키값들을 YYYY-MM-DD 키를 가진 맵으로 정규화
+        const normalizedIndexMap = {};
+        Object.keys(NEWS_INDEX).forEach(key => {
+            const normKey = normalizeDateStr(key);
+            normalizedIndexMap[normKey] = NEWS_INDEX[key];
+        });
 
         window.onload = function() {
             fetchRepoFiles();
@@ -275,17 +288,10 @@
                     rawDate = `${y}-${m}-${d}`;
                 }
 
-                // 파일명에서 확장자와 날짜 숫자를 제거해 요약 제목 자동 추출
-                const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'));
-                let summaryExtract = fileNameWithoutExt.replace(/(20\d{2})[-._]?([01]?\d)[-._]?([0-3]?\d)/, '').replace(/^[-._\s]+/, '').trim();
-
                 if (!groups[rawDate]) {
-                    groups[rawDate] = {
-                        files: [],
-                        summary: summaryExtract || "주간 주요 소식 및 안내사항"
-                    };
+                    groups[rawDate] = [];
                 }
-                groups[rawDate].files.push(file);
+                groups[rawDate].push(file);
             });
 
             const sortedDates = Object.keys(groups).sort((a, b) => {
@@ -295,13 +301,12 @@
             });
 
             newsGroupList = sortedDates.map((dateStr, idx) => {
-                groups[dateStr].files.sort((a, b) => a.name.localeCompare(b.name));
+                groups[dateStr].sort((a, b) => a.name.localeCompare(b.name));
                 return {
                     id: idx,
                     rawDate: dateStr,
                     formattedDate: dateStr !== '기타' ? formatDateWithDay(dateStr) : '기타 소식지',
-                    summary: groups[dateStr].summary,
-                    images: groups[dateStr].files.map(f => f.download_url)
+                    images: groups[dateStr].map(f => f.download_url)
                 };
             });
 
@@ -332,13 +337,16 @@
                 card.className = 'news-card';
                 card.onclick = () => openModal(item.id);
 
+                // NEWS_INDEX에 적힌 요약글 불러오기
+                const summaryText = normalizedIndexMap[item.rawDate] || "주간 주요 소식 및 안내사항";
+
                 card.innerHTML = `
                     <div class="thumb-wrapper">
                         <img src="${item.images[0]}" class="thumb-img" alt="${item.formattedDate} 소식지">
                     </div>
                     <div class="card-info">
                         <div class="card-title">${item.formattedDate}</div>
-                        <div class="card-summary">${item.summary}</div>
+                        <div class="card-summary">${summaryText}</div>
                     </div>
                 `;
                 grid.appendChild(card);
