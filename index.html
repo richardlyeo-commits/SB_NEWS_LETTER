@@ -50,7 +50,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            cursor: pointer; /* 카드 전체 클릭 가능 표시 */
+            cursor: pointer;
         }
 
         .news-card:hover {
@@ -92,14 +92,14 @@
             word-break: keep-all;
         }
 
-        /* 소식지 요약 텍스트 (보기 버튼 대체) */
+        /* 소식지 요약 텍스트 (긴 파일명도 최대 2줄까지만 표시) */
         .card-summary {
             font-size: 11px;
             color: #64748b;
             line-height: 1.3;
             word-break: keep-all;
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* 최대 2줄까지만 표시 후 ... 처리 */
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -181,7 +181,7 @@
             font-size: 14px;
         }
 
-        /* 스마트폰 전용 미세조정 (최대 3개 배치 지원) */
+        /* 스마트폰 전용 미세조정 */
         @media (max-width: 480px) {
             .card-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -214,7 +214,7 @@
             <h1 class="site-title">📰 삼영보영 주간소식 목록</h1>
         </div>
 
-        <!-- 카드 목록 영역 (격자 구조) -->
+        <!-- 카드 목록 영역 -->
         <div id="card-grid" class="card-grid"></div>
     </div>
 
@@ -275,27 +275,33 @@
                     rawDate = `${y}-${m}-${d}`;
                 }
 
+                // 파일명에서 확장자와 날짜 숫자를 제거해 요약 제목 자동 추출
+                const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'));
+                let summaryExtract = fileNameWithoutExt.replace(/(20\d{2})[-._]?([01]?\d)[-._]?([0-3]?\d)/, '').replace(/^[-._\s]+/, '').trim();
+
                 if (!groups[rawDate]) {
-                    groups[rawDate] = [];
+                    groups[rawDate] = {
+                        files: [],
+                        summary: summaryExtract || "주간 주요 소식 및 안내사항"
+                    };
                 }
-                groups[rawDate].push(file);
+                groups[rawDate].files.push(file);
             });
 
             const sortedDates = Object.keys(groups).sort((a, b) => {
                 if (a === '기타') return 1;
                 if (b === '기타') return -1;
-                if (a < b) return 1;
-                if (a > b) return -1;
-                return 0;
+                return b.localeCompare(a);
             });
 
             newsGroupList = sortedDates.map((dateStr, idx) => {
-                groups[dateStr].sort((a, b) => a.name.localeCompare(b.name));
+                groups[dateStr].files.sort((a, b) => a.name.localeCompare(b.name));
                 return {
                     id: idx,
                     rawDate: dateStr,
                     formattedDate: dateStr !== '기타' ? formatDateWithDay(dateStr) : '기타 소식지',
-                    images: groups[dateStr].map(f => f.download_url)
+                    summary: groups[dateStr].summary,
+                    images: groups[dateStr].files.map(f => f.download_url)
                 };
             });
 
@@ -324,15 +330,7 @@
             newsGroupList.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'news-card';
-                card.onclick = () => openModal(item.id); /* 카드 클릭 시 모달 열기 */
-
-                /* 소식지 날짜별 요약 문구 설정 */
-                let summaryText = "주간 주요 소식 및 안내사항";
-                if (item.formattedDate.includes("2026.06.15")) {
-                    summaryText = "월암영업소 차량가동 및 근태 보고";
-                } else if (item.formattedDate.includes("기타")) {
-                    summaryText = "사내 주요 소식 모음";
-                }
+                card.onclick = () => openModal(item.id);
 
                 card.innerHTML = `
                     <div class="thumb-wrapper">
@@ -340,7 +338,7 @@
                     </div>
                     <div class="card-info">
                         <div class="card-title">${item.formattedDate}</div>
-                        <div class="card-summary">${summaryText}</div>
+                        <div class="card-summary">${item.summary}</div>
                     </div>
                 `;
                 grid.appendChild(card);
