@@ -2,17 +2,17 @@
 <!--
     ==================================================
     PROJECT: 삼영보영 주간 소식지 Web Viewer
-    VERSION: 20260908-6
+    VERSION: 20260908-7
     LAST UPDATED: 2026-09-08
     CHANGES: 
-    - 깃허브 루트 경로에 존재하는 실제 이미지 파일명 직접 연동
+    - 7월 20일 이전 소식지 항목 전체 반영
     ==================================================
 -->
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (v20260908-6)</title>
+    <title>삼영보영 주간 소식지 (v20260908-7)</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Viewer.js CSS (이미지 줌) -->
@@ -47,7 +47,7 @@
             min-height: 100vh;
         }
 
-        /* 🖼️ 수채화 배경 은은한 레이어 */
+        /* 🖼️ 배경 은은한 레이어 */
         body::before {
             content: "";
             position: fixed;
@@ -344,17 +344,17 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo-wrapper">
-                    <img src="logo.jpg?v=20260908-6" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+                    <img src="logo.jpg?v=20260908-7" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
                 </div>
                 <div class="brand-text">
-                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-6</span></h1>
+                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-7</span></h1>
                     <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
                 </div>
             </div>
             <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
         </div>
 
-        <!-- News Grid List (깃허브 루트의 실제 이미지 파일명 연동) -->
+        <!-- News Grid List -->
         <div class="news-grid" id="newsGrid">
             
             <div class="news-card" data-img="20260907_1.jpg">
@@ -405,6 +405,14 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
+            <div class="news-card" data-img="20260728_종점_전_하차요구금지.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-28</span>
+                    <span class="card-title">종점 전 하차요구 금지 안내</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
             <div class="news-card" data-img="20260727_1.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-07-27</span>
@@ -417,6 +425,22 @@
                 <div class="card-info">
                     <span class="date-badge">2026-07-20</span>
                     <span class="card-title">7월 3주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260713_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-13</span>
+                    <span class="card-title">7월 2주차 주간 소식지</span>
+                </div>
+                <div class="btn-view">🔍 보기</div>
+            </div>
+
+            <div class="news-card" data-img="20260706_1.jpg">
+                <div class="card-info">
+                    <span class="date-badge">2026-07-06</span>
+                    <span class="card-title">7월 1주차 주간 소식지</span>
                 </div>
                 <div class="btn-view">🔍 보기</div>
             </div>
@@ -452,7 +476,7 @@
     <!-- Viewer.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        console.log("App Version: 20260908-6 Loaded");
+        console.log("App Version: 20260908-7 Loaded");
 
         const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
         const ADMIN_PASSWORD = "1234";
