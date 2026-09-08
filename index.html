@@ -219,8 +219,13 @@
         const REPO_NAME = "SB_NEWS_LETTER";
 
         /*
-           📌 주간 소식지 요약 인덱스
-           "YYYYMMDD" 또는 "YYYY-MM-DD" 형태로 자유롭게 입력하실 수 있습니다.
+           📍 1. 구글 스프레드시트 연동 시: 복사한 CSV 주소를 아래 따옴표 안에 넣어주세요.
+           (구글 시트를 안 쓸 때는 빈 값 ""으로 그대로 두시면 됩니다.)
+        */
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfzxzycHpbzFnnX_D2TOKB2ZPUQZmbOv5M-3P3cDuBZQ8udJnorBSb84hSzKmAIEPRk4D9B7q4TaR4/pub?gid=0&single=true&output=csv";
+
+        /*
+           📍 2. 자체 인덱스 사용 시: 구글 시트 URL이 없을 때 사용됩니다.
         */
         const NEWS_INDEX = {
             "20260831": "8월 5주차 차량가동 및 근태 관리 안내",
@@ -231,8 +236,9 @@
         };
 
         let newsGroupList = [];
+        let newsSummariesMap = {};
 
-        // 날짜 규격화 (어떤 형식으로 입력되어도 YYYY-MM-DD로 통일)
+        // 날짜 규격화 (YYYYMMDD 또는 YYYY-MM-DD -> YYYY-MM-DD 통일)
         function normalizeDateStr(str) {
             if (!str) return '';
             const cleaned = str.replace(/[^0-9]/g, '');
@@ -242,16 +248,43 @@
             return str;
         }
 
-        // NEWS_INDEX의 키값들을 YYYY-MM-DD 키를 가진 맵으로 정규화
-        const normalizedIndexMap = {};
-        Object.keys(NEWS_INDEX).forEach(key => {
-            const normKey = normalizeDateStr(key);
-            normalizedIndexMap[normKey] = NEWS_INDEX[key];
-        });
+        window.onload = async function() {
+            // 기본 인덱스 데이터 로드
+            Object.keys(NEWS_INDEX).forEach(key => {
+                const normKey = normalizeDateStr(key);
+                newsSummariesMap[normKey] = NEWS_INDEX[key];
+            });
 
-        window.onload = function() {
+            // 구글 시트가 설정되어 있다면 구글 시트 데이터로 덮어쓰기
+            await fetchGoogleSheetSummaries();
             fetchRepoFiles();
         };
+
+        // 구글 시트에서 요약 데이터 가져오기
+        async function fetchGoogleSheetSummaries() {
+            if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.trim() === "") return;
+
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const csvText = await response.text();
+                
+                const lines = csvText.split('\n');
+                lines.forEach(line => {
+                    const parts = line.split(',');
+                    if (parts.length >= 2) {
+                        const rawDate = parts[0].trim().replace(/"/g, '');
+                        const summary = parts.slice(1).join(',').trim().replace(/"/g, '');
+                        const normDate = normalizeDateStr(rawDate);
+                        
+                        if (normDate && summary) {
+                            newsSummariesMap[normDate] = summary;
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("구글 스프레드시트 데이터를 불러오지 못했습니다.", err);
+            }
+        }
 
         async function fetchRepoFiles() {
             const grid = document.getElementById('card-grid');
@@ -337,8 +370,7 @@
                 card.className = 'news-card';
                 card.onclick = () => openModal(item.id);
 
-                // NEWS_INDEX에 적힌 요약글 불러오기
-                const summaryText = normalizedIndexMap[item.rawDate] || "주간 주요 소식 및 안내사항";
+                const summaryText = newsSummariesMap[item.rawDate] || "주간 주요 소식 및 안내사항";
 
                 card.innerHTML = `
                     <div class="thumb-wrapper">
