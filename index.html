@@ -2,17 +2,18 @@
 <!--
     ==================================================
     PROJECT: 삼영보영 주간 소식지 Web Viewer
-    VERSION: 20260908-7
+    VERSION: 20260908-8
     LAST UPDATED: 2026-09-08
     CHANGES: 
-    - 7월 20일 이전 소식지 항목 전체 반영
+    - 2장 이상 소식지 다중 이미지(갤러리 슬라이드) 연동 지원
+    - Viewer.js 이전/다음 이동 버튼 및 하단 썸네일 바 활성화
     ==================================================
 -->
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (v20260908-7)</title>
+    <title>삼영보영 주간 소식지 (v20260908-8)</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Viewer.js CSS (이미지 줌) -->
@@ -344,17 +345,17 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo-wrapper">
-                    <img src="logo.jpg?v=20260908-7" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+                    <img src="logo.jpg?v=20260908-8" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
                 </div>
                 <div class="brand-text">
-                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-7</span></h1>
+                    <h1>삼영보영 주간 소식지 <span class="version-tag">v20260908-8</span></h1>
                     <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
                 </div>
             </div>
             <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
         </div>
 
-        <!-- News Grid List -->
+        <!-- News Grid List (다중 이미지 쉼표 구분) -->
         <div class="news-grid" id="newsGrid">
             
             <div class="news-card" data-img="20260907_1.jpg">
@@ -365,7 +366,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260831_1.jpg">
+            <div class="news-card" data-img="20260831_1.jpg,20260831_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-31</span>
                     <span class="card-title">전기버스 화재대비훈련·소급 급여명세서 교부 및 신호위반 예방</span>
@@ -373,7 +374,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260824_1.jpg">
+            <div class="news-card" data-img="20260824_1.jpg,20260824_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-24</span>
                     <span class="card-title">경기프리미엄 P9902 개통·8-2번 우회운행 및 쿨스카프 지급</span>
@@ -381,7 +382,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260817_1.jpg">
+            <div class="news-card" data-img="20260817_1.jpg,20260817_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-17</span>
                     <span class="card-title">잠실역 환승센터 PSD 주의·운자가격증명 게시 및 폭염 온열질환 예방</span>
@@ -389,7 +390,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260810_1.jpg">
+            <div class="news-card" data-img="20260810_1.jpg,20260810_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-10</span>
                     <span class="card-title">8월 2주차 주간 소식지</span>
@@ -397,7 +398,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260803_1.jpg">
+            <div class="news-card" data-img="20260803_1.jpg,20260803_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-08-03</span>
                     <span class="card-title">8월 1주차 주간 소식지</span>
@@ -413,7 +414,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260727_1.jpg">
+            <div class="news-card" data-img="20260727_1.jpg,20260727_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-07-27</span>
                     <span class="card-title">7월 4주차 주간 소식지</span>
@@ -421,7 +422,7 @@
                 <div class="btn-view">🔍 보기</div>
             </div>
 
-            <div class="news-card" data-img="20260720_1.jpg">
+            <div class="news-card" data-img="20260720_1.jpg,20260720_2.jpg">
                 <div class="card-info">
                     <span class="date-badge">2026-07-20</span>
                     <span class="card-title">7월 3주차 주간 소식지</span>
@@ -476,7 +477,7 @@
     <!-- Viewer.js JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        console.log("App Version: 20260908-7 Loaded");
+        console.log("App Version: 20260908-8 Loaded");
 
         const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
         const ADMIN_PASSWORD = "1234";
@@ -500,27 +501,47 @@
             document.getElementById('addModal').style.display = 'none';
         }
 
+        // 🟢 다중 이미지 갤러리 지원 Viewer.js 초기화 함수
         function initViewer() {
             const cards = document.querySelectorAll('.news-card');
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    const imgSrc = card.getAttribute('data-img');
-                    if (!imgSrc) {
+                    const imgData = card.getAttribute('data-img');
+                    if (!imgData) {
                         alert("등록된 소식지 이미지가 없습니다.");
                         return;
                     }
-                    const img = document.createElement('img');
-                    img.src = imgSrc;
-                    
-                    const viewer = new Viewer(img, {
-                        hidden() { viewer.destroy(); },
-                        navbar: false,
+
+                    // 쉼표(,)로 구분된 파일명들을 배열로 분리
+                    const imgList = imgData.split(',').map(item => item.trim());
+
+                    // Viewer.js 갤러리용 임시 컨테이너 생성
+                    const container = document.createElement('div');
+                    container.style.display = 'none';
+
+                    imgList.forEach(src => {
+                        const img = document.createElement('img');
+                        img.src = src;
+                        container.appendChild(img);
+                    });
+
+                    document.body.appendChild(container);
+
+                    // 갤러리 슬라이드 모드로 뷰어 실행
+                    const viewer = new Viewer(container, {
+                        hidden() {
+                            viewer.destroy();
+                            container.remove(); // 뷰어 닫을 때 임시 노드 삭제
+                        },
+                        navbar: true, // 하단 썸네일 네비게이션
                         title: false,
                         toolbar: {
                             zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1,
+                            prev: 1, next: 1, // 이전 / 다음장 이동 버튼
                             rotateLeft: 1, rotateRight: 1, flipHorizontal: 0, flipVertical: 0
                         }
                     });
+
                     viewer.show();
                 });
             });
