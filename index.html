@@ -3,844 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Viewer.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
-    
-    <style>
-        :root {
-            --primary: #1e40af;
-            --primary-hover: #1d4ed8;
-            --bg-body: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.90);
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --border-color: rgba(226, 232, 240, 0.8);
-            --accent-green: #059669;
-            --accent-red: #ef4444;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            padding: 32px 16px;
-            -webkit-font-smoothing: antialiased;
-            position: relative;
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.25;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .container {
-            max-width: 920px;
-            margin: 0 auto;
-        }
-
-        /* Header Section */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            gap: 16px;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 20px 26px;
-            border-radius: 18px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .brand-logo-wrapper {
-            background: #ffffff;
-            padding: 8px 14px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .brand-logo {
-            height: 44px;
-            width: auto;
-            max-width: 180px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .brand-text h1 {
-            font-size: 1.45rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .brand-text p {
-            font-size: 0.86rem;
-            color: var(--text-sub);
-            margin-top: 3px;
-        }
-
-        .btn-add-modal {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22);
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .btn-add-modal:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.32);
-        }
-
-        /* News Card Grid */
-        .news-grid {
-            display: grid;
-            gap: 14px;
-        }
-
-        .news-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 18px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-            cursor: pointer;
-            gap: 16px;
-        }
-
-        .news-card:hover {
-            border-color: #93c5fd;
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.10);
-        }
-
-        .card-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-grow: 1;
-        }
-
-        .date-badge {
-            background-color: #eff6ff;
-            color: var(--primary);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.88rem;
-            white-space: nowrap;
-            letter-spacing: -0.2px;
-        }
-
-        .badge-new {
-            background-color: var(--accent-red);
-            color: white;
-            font-size: 0.68rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
-            vertical-align: middle;
-            font-weight: 800;
-        }
-
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            line-height: 1.45;
-            word-break: keep-all;
-        }
-
-        .btn-view {
-            background-color: #f1f5f9;
-            color: var(--text-sub);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .news-card:hover .btn-view {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        /* 🔢 Pagination UI */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-top: 30px;
-            padding: 10px;
-        }
-
-        .page-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-color);
-            color: var(--text-sub);
-            min-width: 38px;
-            height: 38px;
-            padding: 0 10px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-        }
-
-        .page-btn:hover:not(:disabled) {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .page-btn.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            font-weight: 700;
-        }
-
-        .page-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background: white;
-            width: 100%;
-            max-width: 500px;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .btn-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-sub);
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.88rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.95rem;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            height: 90px;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 640px) {
-            body { padding: 16px 12px; }
-            .header { flex-direction: column; align-items: flex-start; padding: 16px; gap: 12px; }
-            .brand-logo { height: 38px; }
-            .btn-add-modal { width: 100%; justify-content: center; }
-            .news-card { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
-            .card-info { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .btn-view { align-self: flex-end; }
-        }
-    </style>
+    <title>삼영보영 주간 소식지 (20260909_1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PDF.js 라이브러리 (PDF -> 이미지 자동 변환) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="brand">
-                <div class="brand-logo-wrapper">
-                    <img src="logo.jpg" alt="삼영운수 보영운수" class="brand-logo" onerror="this.parentElement.style.display='none'">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- 헤더 영역 -->
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-slate-900">삼영보영 주간 소식지</h1>
+                    <!-- 요청하신 YYYYMMDD_1 규격 적용 -->
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_1</span>
                 </div>
-                <div class="brand-text">
-                    <h1>삼영보영 주간 소식지</h1>
-                    <p>항목을 클릭하면 고화질 소식지 원본을 확대 열람하실 수 있습니다.</p>
-                </div>
+                <p class="text-slate-500 text-sm mt-1">항목을 클릭하시면 고화질 소식지 원본을 열람하실 수 있습니다.</p>
             </div>
-            <button class="btn-add-modal" onclick="openModal()">+ 새 소식지 작성</button>
+            <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2">
+                <span>+ 새 소식지 작성</span>
+            </button>
+        </header>
+
+        <!-- 소식지 목록 영역 -->
+        <div id="newsletterList" class="space-y-3">
+            <div class="text-center py-12 text-slate-400">소식지를 불러오는 중입니다...</div>
         </div>
-
-        <!-- News Grid List (전체 소식지 파일 최신순) -->
-        <div class="news-grid" id="newsGrid">
-            
-            <div class="news-card" data-img="20260907_1.jpg,20260907_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-09-07 <span class="badge-new">NEW</span></span>
-                    <span class="card-title">9월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260831_1.jpg,20260831_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-08-31</span>
-                    <span class="card-title">전기버스 화재대비훈련·소급 급여명세서 교부 및 신호위반 예방</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260824_1.jpg,20260824_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-08-24</span>
-                    <span class="card-title">경기프리미엄 P9902 개통·8-2번 우회운행 및 쿨스카프 지급</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260817_1.jpg,20260817_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-08-17</span>
-                    <span class="card-title">잠실역 환승센터 PSD 주의·운자가격증명 게시 및 폭염 온열질환 예방</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260810_1.jpg,20260810_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-08-10</span>
-                    <span class="card-title">8월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260803_1.jpg,20260803_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-08-03</span>
-                    <span class="card-title">8월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260728_종점_전_하차요구금지.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-28</span>
-                    <span class="card-title">종점 전 하차요구 금지 안내</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260727_1.jpg,20260727_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-27</span>
-                    <span class="card-title">7월 4주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260720_1.jpg,20260720_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-20</span>
-                    <span class="card-title">7월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260714_휠체어장애인 승차거부금지 공지문.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-14</span>
-                    <span class="card-title">휠체어 장애인 승차거부 금지 공지문</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260713_1.jpg,20260713_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-13</span>
-                    <span class="card-title">7월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260706_1.jpg,20260706_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-07-06</span>
-                    <span class="card-title">7월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260630_중대과실.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-06-30</span>
-                    <span class="card-title">중대과실 사고 예방 공지문</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260629_1.jpg,20260629_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-06-29</span>
-                    <span class="card-title">6월 5주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260615_1.jpg,20260615_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-06-15</span>
-                    <span class="card-title">6월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260608_1.jpg,20260608_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-06-08</span>
-                    <span class="card-title">6월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260607_1.jpg,20260607_정류장질서문란.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-06-07</span>
-                    <span class="card-title">정류장 질서문란 행위 근절 공지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260525_1.jpg,20260525_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-05-25</span>
-                    <span class="card-title">5월 4주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260518_1.jpg,20260518_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-05-18</span>
-                    <span class="card-title">5월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260511_1.png,20260511_2.png">
-                <div class="card-info">
-                    <span class="date-badge">2026-05-11</span>
-                    <span class="card-title">5월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260504_1.jpg,20260504_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-05-04</span>
-                    <span class="card-title">5월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260420_1.jpg,20260420_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-04-20</span>
-                    <span class="card-title">4월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260416-운행질서 개선 공지문.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-04-16</span>
-                    <span class="card-title">운행질서 개선 공지문</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260413_1.jpg,20260413_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-04-13</span>
-                    <span class="card-title">4월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260406_1.jpg,20260406_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-04-06</span>
-                    <span class="card-title">4월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260330_1.jpg,20260330_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-03-30</span>
-                    <span class="card-title">3월 5주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260323_1.jpg,20260323_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-03-23</span>
-                    <span class="card-title">3월 4주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260316_1.jpg,20260316_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-03-16</span>
-                    <span class="card-title">3월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260309_1.jpg,20260309_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-03-09</span>
-                    <span class="card-title">3월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260303_1.jpg,20260303_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-03-03</span>
-                    <span class="card-title">3월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260216_1.jpg,20260216_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-02-16</span>
-                    <span class="card-title">2월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260202_1.jpg,20260202_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-02-02</span>
-                    <span class="card-title">2월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260126_1.jpg,20260126_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-01-26</span>
-                    <span class="card-title">1월 4주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260119_1.jpg,20260119_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-01-19</span>
-                    <span class="card-title">1월 3주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260112_1.jpg,20260112_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-01-12</span>
-                    <span class="card-title">1월 2주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-            <div class="news-card" data-img="20260105_1.jpg,20260105_2.jpg">
-                <div class="card-info">
-                    <span class="date-badge">2026-01-05</span>
-                    <span class="card-title">1월 1주차 주간 소식지</span>
-                </div>
-                <div class="btn-view">🔍 보기</div>
-            </div>
-
-        </div>
-
-        <!-- 🔢 하단 페이지네이션 영역 -->
-        <div class="pagination" id="pagination"></div>
     </div>
 
-    <!-- 작성 팝업 (Modal) -->
-    <div class="modal-overlay" id="addModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2>새 소식지 등록</h2>
-                <button class="btn-close" onclick="closeModal()">&times;</button>
+    <!-- 작성 모달 -->
+    <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-slate-900">새 소식지 등록</h2>
+                <span class="text-xs text-slate-400">System 20260909_1</span>
             </div>
-            <form id="uploadForm" onsubmit="handleFormSubmit(event)">
-                <div class="form-group">
-                    <label for="newsDate">발행 일자</label>
-                    <input type="date" id="newsDate" class="form-control" required>
+            
+            <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">발행일자 (수동 지정)</label>
+                    <input type="date" id="newsDate" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
-                <div class="form-group">
-                    <label for="newsTitle">소식지 요약 내용</label>
-                    <textarea id="newsTitle" class="form-control" placeholder="주요 소식 요약 문구를 입력하세요" required></textarea>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">소식지 제목</label>
+                    <input type="text" id="newsTitle" placeholder="예: 9월 2주차 주간 소식지" required class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
-                <div class="form-group">
-                    <label for="newsFile">소식지 이미지 파일 (여러 장 선택 가능)</label>
-                    <input type="file" id="newsFile" class="form-control" accept="image/*" multiple required>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">소식지 파일 (PDF 또는 이미지)</label>
+                    <input type="file" id="newsFile" accept="image/*,application/pdf" multiple required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                    <p class="text-xs text-slate-400 mt-1">* PDF 파일은 자동으로 PNG 이미지로 변환되어 저장됩니다.</p>
                 </div>
-                <button type="submit" class="btn-submit" id="submitBtn">소식지 등록하기</button>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-slate-500 font-medium text-sm hover:bg-slate-100 rounded-lg transition-colors">취소</button>
+                    <button type="submit" id="submitBtn" class="px-4 py-2 bg-emerald-600 text-white font-medium text-sm rounded-lg hover:bg-emerald-700 transition-colors">소식지 등록하기</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- Viewer.js JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
     <script>
-        const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
-        const ADMIN_PASSWORD = "1234";
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // ⚙️ 페이지네이션 설정 (한 페이지당 10개씩)
-        const ITEMS_PER_PAGE = 10;
-        let currentPage = 1;
-        let totalPages = 1;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initViewer();
-            setupPagination();
-            document.getElementById('newsDate').valueAsDate = new Date();
-        });
-
-        // 🟢 페이지네이션 생성 및 화면 처리
-        function setupPagination() {
-            const cards = document.querySelectorAll('.news-card');
-            totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
-            showPage(1);
-        }
-
-        function showPage(page) {
-            currentPage = page;
-            const cards = document.querySelectorAll('.news-card');
-            const startIndex = (page - 1) * ITEMS_PER_PAGE;
-            const endIndex = startIndex + ITEMS_PER_PAGE;
-
-            cards.forEach((card, index) => {
-                if (index >= startIndex && index < endIndex) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            renderPaginationButtons();
-        }
-
-        function renderPaginationButtons() {
-            const paginationContainer = document.getElementById('pagination');
-            paginationContainer.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            // 이전 버튼
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'page-btn';
-            prevBtn.innerText = '‹';
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    showPage(currentPage - 1);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
-            paginationContainer.appendChild(prevBtn);
-
-            // 숫자 버튼
-            for (let i = 1; i <= totalPages; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                pageBtn.innerText = i;
-                pageBtn.addEventListener('click', () => {
-                    showPage(i);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-                paginationContainer.appendChild(pageBtn);
-            }
-
-            // 다음 버튼
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'page-btn';
-            nextBtn.innerText = '›';
-            nextBtn.disabled = currentPage === totalPages;
-            nextBtn.addEventListener('click', () => {
-                if (currentPage < totalPages) {
-                    showPage(currentPage + 1);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
-            paginationContainer.appendChild(nextBtn);
-        }
+        // Google Apps Script Web App URL 입력
+        const API_URL = "YOUR_GAS_WEB_APP_URL"; 
 
         function openModal() {
-            const userInput = prompt("관리자 비밀번호를 입력해주세요:");
-            if (userInput === null) return;
-            if (userInput === ADMIN_PASSWORD) {
-                document.getElementById('addModal').style.display = 'flex';
-            } else {
-                alert("비밀번호가 올바르지 않습니다.");
-            }
+            document.getElementById('uploadModal').classList.remove('hidden');
+            document.getElementById('uploadModal').classList.add('flex');
+            document.getElementById('newsDate').value = new Date().toISOString().substring(0, 10);
         }
 
         function closeModal() {
-            document.getElementById('addModal').style.display = 'none';
-        }
-
-        // 🟢 다중 이미지 viewer 연동
-        function initViewer() {
-            const cards = document.querySelectorAll('.news-card');
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const imgData = card.getAttribute('data-img');
-                    if (!imgData) {
-                        alert("등록된 소식지 이미지가 없습니다.");
-                        return;
-                    }
-
-                    const imgList = imgData.split(',').map(item => item.trim());
-
-                    const container = document.createElement('div');
-                    container.style.display = 'none';
-
-                    imgList.forEach(src => {
-                        const img = document.createElement('img');
-                        img.src = src;
-                        container.appendChild(img);
-                    });
-
-                    document.body.appendChild(container);
-
-                    const viewer = new Viewer(container, {
-                        hidden() {
-                            viewer.destroy();
-                            container.remove();
-                        },
-                        navbar: true,
-                        title: false,
-                        toolbar: {
-                            zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1,
-                            prev: 1, next: 1,
-                            rotateLeft: 1, rotateRight: 1, flipHorizontal: 0, flipVertical: 0
-                        }
-                    });
-
-                    viewer.show();
-                });
-            });
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.getElementById('uploadModal').classList.remove('flex');
+            document.getElementById('uploadForm').reset();
         }
 
         async function handleFormSubmit(e) {
@@ -854,42 +92,91 @@
             if (fileInput.files.length === 0) return;
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "업로드 중...";
+            submitBtn.innerText = "파일 변환 처리 중...";
 
-            const fileNames = Array.from(fileInput.files).map(f => f.name).join(',');
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            try {
+                let processedFiles = [];
 
-            reader.onload = async function() {
-                const base64Data = reader.result.split(',')[1];
-                
+                for (const file of fileInput.files) {
+                    if (file.type === 'application/pdf') {
+                        // PDF -> PNG 자동 변환
+                        const pdfImages = await convertPdfToImages(file, date, title);
+                        processedFiles.push(...pdfImages);
+                    } else if (file.type.startsWith('image/')) {
+                        // 일반 이미지 읽기
+                        const base64Data = await readImageAsBase64(file);
+                        const ext = file.name.split('.').pop();
+                        const formattedName = `${date}_${title}_${processedFiles.length + 1}.${ext}`;
+
+                        processedFiles.push({
+                            name: formattedName,
+                            mimeType: file.type,
+                            data: base64Data
+                        });
+                    }
+                }
+
+                submitBtn.innerText = "업로드 중...";
+
                 const payload = {
                     date: date,
                     title: title,
-                    filename: fileNames,
-                    mimeType: file.type,
-                    fileData: base64Data
+                    files: processedFiles
                 };
 
-                try {
-                    await fetch(API_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(payload)
-                    });
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
 
-                    alert("소식지가 성공적으로 등록되었습니다!");
-                    closeModal();
-                    location.reload();
-                } catch (error) {
-                    console.error("등록 실패:", error);
-                    alert("등록 중 오류가 발생했습니다.");
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "소식지 등록하기";
-                }
-            };
+                alert("소식지가 성공적으로 등록되었습니다!");
+                closeModal();
+                location.reload();
 
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error("등록 실패:", error);
+                alert("등록 중 오류가 발생했습니다.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "소식지 등록하기";
+            }
+        }
+
+        async function convertPdfToImages(file, date, title) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const images = [];
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                const base64Data = canvas.toDataURL('image/png').split(',')[1];
+                const fileName = `${date}_${title}_page${i}.png`;
+
+                images.push({
+                    name: fileName,
+                    mimeType: 'image/png',
+                    data: base64Data
+                });
+            }
+            return images;
+        }
+
+        function readImageAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
     </script>
 </body>
