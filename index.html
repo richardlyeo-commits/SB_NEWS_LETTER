@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260909_2)</title>
+    <title>삼영보영 주간 소식지 (20260909_3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PDF.js 라이브러리 -->
+    <!-- PDF.js 라이브러리 (PDF -> 이미지 자동 변환) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -16,7 +16,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-2xl font-bold text-slate-900">삼영보영 주간 소식지</h1>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_2</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_3</span>
                 </div>
                 <p class="text-slate-500 text-sm mt-1">항목을 클릭하시면 고화질 소식지 원본을 열람하실 수 있습니다.</p>
             </div>
@@ -36,7 +36,7 @@
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-slate-900">새 소식지 등록</h2>
-                <span class="text-xs text-slate-400">System 20260909_2</span>
+                <span class="text-xs text-slate-400">System 20260909_3</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -65,46 +65,40 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // ⚠️ 실제 배포한 Google Apps Script 웹 앱 URL을 여기에 넣으셔야 합니다.
-        const API_URL = "YOUR_GAS_WEB_APP_URL"; 
+        const STORAGE_KEY = "SYBY_NEWSLETTERS_DATA";
 
-        // 페이지 로드 시 소식지 목록 가져오기
+        // 페이지 로드 시 목록 불러오기
         window.addEventListener('DOMContentLoaded', loadNewsletters);
 
-        async function loadNewsletters() {
+        function loadNewsletters() {
             const listContainer = document.getElementById('newsletterList');
-            
-            if (API_URL === "YOUR_GAS_WEB_APP_URL" || !API_URL) {
-                listContainer.innerHTML = `<div class="text-center py-12 text-rose-500 font-medium">API_URL 설정이 누락되었습니다. 스크립트 내 API_URL을 확인해 주세요.</div>`;
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+            if (data.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
                 return;
             }
 
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json(); // 백엔드에서 [{ date, title, url }, ...] 형태 반환 가정
+            // 날짜 내림차순 정렬 (최신순)
+            data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                if (!data || data.length === 0) {
-                    listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
-                    return;
-                }
-
-                listContainer.innerHTML = data.map((item, index) => `
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">${item.date}</span>
-                            ${index === 0 ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>' : ''}
-                            <h2 class="font-medium text-slate-800">${item.title}</h2>
-                        </div>
-                        <a href="${item.url}" target="_blank" class="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 text-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 font-medium">
-                            🔍 보기
-                        </a>
+            listContainer.innerHTML = data.map((item, index) => `
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">${item.date}</span>
+                        ${index === 0 ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>' : ''}
+                        <h2 class="font-medium text-slate-800">${item.title}</h2>
                     </div>
-                `).join('');
-
-            } catch (error) {
-                console.error("목록 로드 실패:", error);
-                listContainer.innerHTML = `<div class="text-center py-12 text-rose-500">소식지 목록을 불러오는 중 오류가 발생했습니다.</div>`;
-            }
+                    <div class="flex items-center gap-2">
+                        <button onclick="viewNewsletter('${item.id}')" class="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 text-sm px-3 py-1.5 rounded-lg transition-colors font-medium">
+                            🔍 보기
+                        </button>
+                        <button onclick="deleteNewsletter('${item.id}')" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-400 text-sm px-2.5 py-1.5 rounded-lg transition-colors">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function openModal() {
@@ -133,59 +127,56 @@
             submitBtn.innerText = "파일 변환 처리 중...";
 
             try {
-                let processedFiles = [];
+                let images = [];
 
                 for (const file of fileInput.files) {
                     if (file.type === 'application/pdf') {
-                        const pdfImages = await convertPdfToImages(file, date, title);
-                        processedFiles.push(...pdfImages);
+                        const pdfImages = await convertPdfToImages(file);
+                        images.push(...pdfImages);
                     } else if (file.type.startsWith('image/')) {
                         const base64Data = await readImageAsBase64(file);
-                        const ext = file.name.split('.').pop();
-                        const formattedName = `${date}_${title}_${processedFiles.length + 1}.${ext}`;
-
-                        processedFiles.push({
-                            name: formattedName,
-                            mimeType: file.type,
-                            data: base64Data
-                        });
+                        images.push(base64Data);
                     }
                 }
 
-                submitBtn.innerText = "업로드 중...";
-
-                const payload = {
+                const newItem = {
+                    id: Date.now().toString(),
                     date: date,
                     title: title,
-                    files: processedFiles
+                    images: images
                 };
 
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
+                const existingData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+                existingData.push(newItem);
+                
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(existingData));
+                } catch (e) {
+                    alert("용량이 초과되었습니다. 기존 소식지를 일부 삭제하거나 파일 용량을 줄여주세요.");
+                    return;
+                }
 
                 alert("소식지가 성공적으로 등록되었습니다!");
                 closeModal();
-                loadNewsletters(); // 새로고침 없이 목록 다시 로드
+                loadNewsletters();
 
             } catch (error) {
                 console.error("등록 실패:", error);
-                alert("등록 중 오류가 발생했습니다.");
+                alert("처리 중 오류가 발생했습니다.");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "소식지 등록하기";
             }
         }
 
-        async function convertPdfToImages(file, date, title) {
+        async function convertPdfToImages(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             const images = [];
 
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 2.0 });
+                const viewport = page.getViewport({ scale: 1.5 });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
 
@@ -193,15 +184,7 @@
                 canvas.width = viewport.width;
 
                 await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-                const base64Data = canvas.toDataURL('image/png').split(',')[1];
-                const fileName = `${date}_${title}_page${i}.png`;
-
-                images.push({
-                    name: fileName,
-                    mimeType: 'image/png',
-                    data: base64Data
-                });
+                images.push(canvas.toDataURL('image/jpeg', 0.8));
             }
             return images;
         }
@@ -209,10 +192,40 @@
         function readImageAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onload = () => resolve(reader.result);
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
+        }
+
+        function viewNewsletter(id) {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            const item = data.find(i => i.id === id);
+            if (!item) return;
+
+            const win = window.open("", "_blank");
+            win.document.write(`
+                <html>
+                <head>
+                    <title>${item.title}</title>
+                    <style>
+                        body { background: #0f172a; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+                        img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+                    </style>
+                </head>
+                <body>
+                    ${item.images.map(img => `<img src="${img}" />`).join('')}
+                </body>
+                </html>
+            `);
+        }
+
+        function deleteNewsletter(id) {
+            if (!confirm("정말 이 소식지를 삭제하시겠습니까?")) return;
+            let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+            data = data.filter(i => i.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            loadNewsletters();
         }
     </script>
 </body>
