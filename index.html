@@ -3,74 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260909_7)</title>
+    <title>삼영보영 주간 소식지 (20260909_8)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
     <div class="max-w-4xl mx-auto px-4 py-8">
-        <!-- 헤더 영역 -->
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-2xl font-bold text-slate-900">삼영보영 주간 소식지</h1>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_7</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_8</span>
                 </div>
                 <p class="text-slate-500 text-sm mt-1">항목을 클릭하시면 소식지 원본을 열람하실 수 있습니다.</p>
             </div>
-            <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2">
-                <span>+ 새 소식지 작성</span>
+            <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-xl transition-colors">
+                <span>+ 작성 안내</span>
             </button>
         </header>
 
-        <!-- 소식지 목록 영역 -->
         <div id="newsletterList" class="space-y-3">
             <div class="text-center py-12 text-slate-400">소식지를 불러오는 중입니다...</div>
         </div>
     </div>
 
-    <!-- 작성 모달 -->
+    <!-- 작성 안내 모달 -->
     <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-slate-900">새 소식지 등록 안내</h2>
-                <span class="text-xs text-slate-400">System 20260909_7</span>
+            <h2 class="text-xl font-bold text-slate-900 mb-4">소식지 등록 안내</h2>
+            <div class="space-y-2 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <p>1. GitHub 저장소에 소식지 PDF 또는 이미지 파일을 업로드합니다.</p>
+                <p>2. <code class="bg-slate-200 text-rose-600 px-1 py-0.5 rounded">newsletters.json</code> 파일에 신규 정보를 추가합니다.</p>
             </div>
-            
-            <div class="space-y-4 text-sm text-slate-600">
-                <p>현재 GitHub Pages 정적 사이트 방식으로 운영되고 있습니다.</p>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
-                    <p class="font-bold text-slate-800">📌 소식지 추가 방법:</p>
-                    <p>1. 파일(PDF/이미지)을 GitHub 저장소 내 폴더에 Commit/Push 합니다.</p>
-                    <p>2. 저장소 루트의 <code class="bg-slate-200 px-1 py-0.5 rounded">newsletters.json</code> 파일에 신규 소식지 정보를 작성 후 저장합니다.</p>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-4">
-                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-200 transition-colors">닫기</button>
+            <div class="flex justify-end pt-4">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium">닫기</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 페이지 로드 시 newsletters.json 불러오기
         window.addEventListener('DOMContentLoaded', loadNewsletters);
 
         async function loadNewsletters() {
             const listContainer = document.getElementById('newsletterList');
 
             try {
-                // 저장소 내 newsletters.json 파일 읽기 (캐시 방지 파라미터 추가)
+                // 캐시 방지를 위해 타임스탬프 쿼리 추가
                 const response = await fetch(`./newsletters.json?t=${new Date().getTime()}`);
                 
                 if (!response.ok) {
-                    throw new Error("newsletters.json 파일을 찾을 수 없습니다.");
+                    throw new Error(`파일을 찾을 수 없습니다 (상태 코드: ${response.status})`);
                 }
 
-                const data = await response.json();
+                const textData = await response.text();
+                let data = [];
 
-                if (!data || data.length === 0) {
+                try {
+                    data = JSON.parse(textData);
+                } catch (jsonErr) {
+                    throw new Error("newsletters.json 파일의 문법(JSON 형식)에 오류가 있습니다.");
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
                     listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
                     return;
                 }
@@ -94,8 +88,10 @@
             } catch (error) {
                 console.error("목록 불러오기 오류:", error);
                 listContainer.innerHTML = `
-                    <div class="text-center py-12 text-rose-500 font-medium">
-                        소식지 목록(<code class="bg-rose-50 px-1 py-0.5 rounded">newsletters.json</code>)을 불러오지 못했습니다.
+                    <div class="bg-rose-50 border border-rose-100 p-6 rounded-2xl text-center">
+                        <p class="text-rose-600 font-bold mb-1">⚠️ 데이터 불러오기 실패</p>
+                        <p class="text-rose-500 text-sm">${error.message}</p>
+                        <p class="text-slate-400 text-xs mt-2">newsletters.json 파일의 따옴표(" ")나 쉼표(,) 오타를 확인해 주세요.</p>
                     </div>`;
             }
         }
