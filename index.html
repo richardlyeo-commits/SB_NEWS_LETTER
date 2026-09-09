@@ -3,107 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260909_8)</title>
+    <title>삼영보영 주간 소식지</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        body { font-family: "Pretendard", sans-serif; }
+        .tab-active {
+            background-color: #01794c;
+            color: white;
+        }
+        .tab-inactive {
+            background-color: #f1f5f9;
+            color: #64748b;
+        }
+        .tab-inactive:hover {
+            background-color: #e2e8f0;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-gray-50 text-slate-800 min-h-screen">
 
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-bold text-slate-900">삼영보영 주간 소식지</h1>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_8</span>
+    <!-- 상단 헤더 -->
+    <header class="bg-[#01794c] text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
+                    <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
-                <p class="text-slate-500 text-sm mt-1">항목을 클릭하시면 소식지 원본을 열람하실 수 있습니다.</p>
+                <div class="text-sm text-green-100">
+                    총 <span id="total-count" class="font-bold text-white text-lg">0</span>건
+                </div>
             </div>
-            <button onclick="openModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2.5 rounded-xl transition-colors">
-                <span>+ 작성 안내</span>
+        </div>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="max-w-5xl mx-auto px-4 py-8">
+
+        <!-- 안내 문구 -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6 shadow-sm">
+            <p class="text-slate-600 text-sm leading-relaxed">
+                📌 <strong>삼영보영운수</strong>의 주간 소식지와 공지문을 언제 어디서나 확인하실 수 있습니다. 
+                신입 기사님들은 과거 소식지를 통해 회사 분위기와 시내버스 기사로서의 마음가짐을 익혀보세요.
+            </p>
+        </div>
+
+        <!-- 검색창 -->
+        <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4 shadow-sm">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="날짜, 제목, 내용으로 검색하세요..." 
+                    class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20"
+                >
+                <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 탭 -->
+        <div class="flex gap-2 mb-6">
+            <button id="tab-newsletters" onclick="switchTab('newsletters')" class="tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">
+                📰 주간 소식지
             </button>
-        </header>
-
-        <div id="newsletterList" class="space-y-3">
-            <div class="text-center py-12 text-slate-400">소식지를 불러오는 중입니다...</div>
+            <button id="tab-notices" onclick="switchTab('notices')" class="tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">
+                📢 공지사항
+            </button>
         </div>
-    </div>
 
-    <!-- 작성 안내 모달 -->
-    <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-            <h2 class="text-xl font-bold text-slate-900 mb-4">소식지 등록 안내</h2>
-            <div class="space-y-2 text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <p>1. GitHub 저장소에 소식지 PDF 또는 이미지 파일을 업로드합니다.</p>
-                <p>2. <code class="bg-slate-200 text-rose-600 px-1 py-0.5 rounded">newsletters.json</code> 파일에 신규 정보를 추가합니다.</p>
-            </div>
-            <div class="flex justify-end pt-4">
-                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium">닫기</button>
-            </div>
+        <!-- 소식지/공지문 목록 -->
+        <div id="contentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="col-span-full text-center py-12 text-slate-400">데이터를 불러오는 중입니다...</div>
         </div>
-    </div>
+
+        <!-- 검색 결과 없음 -->
+        <div id="noResult" class="hidden text-center py-12 text-slate-500">
+            <p class="text-lg">검색 결과가 없습니다.</p>
+            <p class="text-sm text-slate-400 mt-1">다른 키워드로 검색해보세요.</p>
+        </div>
+
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-slate-100 border-t border-slate-200 mt-12">
+        <div class="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-slate-500">
+            <p>삼영·보영운수(주) | 경기도 안양시 만안구 석수동 557-7 안양석수공영차고지 시내버스동</p>
+            <p class="mt-1">Tel. 031-472-9111 | Fax. 031-472-9100</p>
+        </div>
+    </footer>
 
     <script>
-        window.addEventListener('DOMContentLoaded', loadNewsletters);
+        let newslettersData = [];
+        let noticesData = [];
+        let currentTab = 'newsletters'; // 'newsletters' | 'notices'
 
-        async function loadNewsletters() {
-            const listContainer = document.getElementById('newsletterList');
+        window.addEventListener('DOMContentLoaded', loadData);
+
+        async function loadData() {
+            const listContainer = document.getElementById('contentList');
 
             try {
-                // 캐시 방지를 위해 타임스탬프 쿼리 추가
-                const response = await fetch(`./newsletters.json?t=${new Date().getTime()}`);
-                
-                if (!response.ok) {
-                    throw new Error(`파일을 찾을 수 없습니다 (상태 코드: ${response.status})`);
-                }
+                const [newsRes, noticeRes] = await Promise.all([
+                    fetch(`./newsletters.json?t=${new Date().getTime()}`),
+                    fetch(`./notices.json?t=${new Date().getTime()}`)
+                ]);
 
-                const textData = await response.text();
-                let data = [];
+                if (!newsRes.ok) throw new Error(`newsletters.json 불러오기 실패 (${newsRes.status})`);
+                if (!noticeRes.ok) throw new Error(`notices.json 불러오기 실패 (${noticeRes.status})`);
 
-                try {
-                    data = JSON.parse(textData);
-                } catch (jsonErr) {
-                    throw new Error("newsletters.json 파일의 문법(JSON 형식)에 오류가 있습니다.");
-                }
+                newslettersData = await newsRes.json();
+                noticesData = await noticeRes.json();
 
-                if (!Array.isArray(data) || data.length === 0) {
-                    listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
-                    return;
-                }
+                if (!Array.isArray(newslettersData)) newslettersData = [];
+                if (!Array.isArray(noticesData)) noticesData = [];
 
-                // 날짜 기준 내림차순 정렬 (최신순)
-                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                // 날짜 기준 정렬
+                newslettersData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                noticesData.sort((a, b) => {
+                    if (!a.date && !b.date) return 0;
+                    if (!a.date) return 1;
+                    if (!b.date) return -1;
+                    return new Date(b.date) - new Date(a.date);
+                });
 
-                listContainer.innerHTML = data.map((item, index) => `
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">${item.date}</span>
-                            ${index === 0 ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>' : ''}
-                            <h2 class="font-medium text-slate-800">${item.title}</h2>
-                        </div>
-                        <a href="${item.url}" target="_blank" class="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 text-sm px-3 py-1.5 rounded-lg transition-colors font-medium flex items-center gap-1">
-                            🔍 보기
-                        </a>
-                    </div>
-                `).join('');
+                document.getElementById('searchInput').addEventListener('input', handleSearch);
+                switchTab('newsletters');
 
             } catch (error) {
-                console.error("목록 불러오기 오류:", error);
+                console.error(error);
                 listContainer.innerHTML = `
-                    <div class="bg-rose-50 border border-rose-100 p-6 rounded-2xl text-center">
-                        <p class="text-rose-600 font-bold mb-1">⚠️ 데이터 불러오기 실패</p>
-                        <p class="text-rose-500 text-sm">${error.message}</p>
-                        <p class="text-slate-400 text-xs mt-2">newsletters.json 파일의 따옴표(" ")나 쉼표(,) 오타를 확인해 주세요.</p>
-                    </div>`;
+                    <div class="col-span-full bg-red-50 border border-red-100 p-6 rounded-2xl text-center">
+                        <p class="text-red-600 font-bold mb-1">⚠️ 데이터 불러오기 실패</p>
+                        <p class="text-red-500 text-sm">${error.message}</p>
+                        <p class="text-slate-400 text-xs mt-2">newsletters.json / notices.json 파일이 있는지 확인해주세요.</p>
+                    </div>
+                `;
             }
         }
 
-        function openModal() {
-            document.getElementById('uploadModal').classList.remove('hidden');
-            document.getElementById('uploadModal').classList.add('flex');
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // 탭 UI 업데이트
+            const newsTab = document.getElementById('tab-newsletters');
+            const noticeTab = document.getElementById('tab-notices');
+
+            if (tab === 'newsletters') {
+                newsTab.className = 'tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors';
+                noticeTab.className = 'tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors';
+            } else {
+                newsTab.className = 'tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors';
+                noticeTab.className = 'tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors';
+            }
+
+            // 검색창 초기화
+            document.getElementById('searchInput').value = '';
+
+            // 데이터 렌더링
+            renderList(getCurrentData());
         }
 
-        function closeModal() {
-            document.getElementById('uploadModal').classList.add('hidden');
-            document.getElementById('uploadModal').classList.remove('flex');
+        function getCurrentData() {
+            return currentTab === 'newsletters' ? newslettersData : noticesData;
+        }
+
+        function renderList(data) {
+            const listContainer = document.getElementById('contentList');
+            const noResult = document.getElementById('noResult');
+            const totalCount = document.getElementById('total-count');
+
+            totalCount.innerText = data.length;
+
+            if (data.length === 0) {
+                listContainer.innerHTML = '';
+                noResult.classList.remove('hidden');
+                return;
+            }
+
+            noResult.classList.add('hidden');
+
+            // NEW 기준: 주간 소식지에서만 최신 2개
+            const newIds = currentTab === 'newsletters' 
+                ? new Set(newslettersData.slice(0, 2).map(item => item.date))
+                : new Set();
+
+            listContainer.innerHTML = data.map((item) => {
+                const isNew = newIds.has(item.date);
+                const formattedDate = formatDate(item.date);
+                const btnText = currentTab === 'newsletters' ? '📖 원본 보기' : '📄 공지문 보기';
+
+                return `
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#01794c]/30 transition-all duration-200 flex flex-col">
+                        <div class="p-5 flex-1">
+                            <div class="flex items-start justify-between gap-2 mb-3">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
+                                    ${formattedDate}
+                                </span>
+                                ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold">NEW</span>' : ''}
+                            </div>
+                            <h2 class="font-bold text-slate-900 text-lg mb-2 leading-tight">${escapeHtml(item.title)}</h2>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">${escapeHtml(item.summary || '')}</p>
+                            ${renderTags(item.tags)}
+                        </div>
+                        <div class="px-5 pb-5 pt-0">
+                            <a href="${item.file_url}" target="_blank" class="block w-full text-center bg-[#01794c] hover:bg-[#015c3b] text-white font-semibold py-2.5 rounded-lg transition-colors">
+                                ${btnText}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '날짜 미상';
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            const date = new Date(dateStr + 'T00:00:00');
+            if (isNaN(date.getTime())) return dateStr;
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const dayName = days[date.getDay()];
+            return `${y}.${m}.${d}(${dayName})`;
+        }
+
+        function renderTags(tags) {
+            if (!Array.isArray(tags) || tags.length === 0) return '';
+            return `
+                <div class="flex flex-wrap gap-1.5 mt-auto">
+                    ${tags.map(tag => `<span class="px-2 py-0.5 bg-[#f0f9f4] text-[#01794c] text-xs font-medium rounded">#${escapeHtml(tag)}</span>`).join('')}
+                </div>
+            `;
+        }
+
+        function handleSearch(e) {
+            const keyword = e.target.value.trim().toLowerCase();
+            const data = getCurrentData();
+
+            if (!keyword) {
+                renderList(data);
+                return;
+            }
+
+            const filtered = data.filter(item => {
+                const title = (item.title || '').toLowerCase();
+                const summary = (item.summary || '').toLowerCase();
+                const date = (item.date || '').toLowerCase();
+                const tags = Array.isArray(item.tags) ? item.tags.join(' ').toLowerCase() : '';
+                return title.includes(keyword) || summary.includes(keyword) || date.includes(keyword) || tags.includes(keyword);
+            });
+
+            renderList(filtered);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     </script>
 </body>

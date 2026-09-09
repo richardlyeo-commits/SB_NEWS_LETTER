@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 소식지 모음</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
+            background-color: #f0f0f0;
+            color: #111;
+            padding: 20px 10px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* 소식지 선택 드롭다운 컨트롤러 */
+        .select-controller {
+            max-width: 850px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .select-controller label {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .select-controller select {
+            padding: 8px 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid #999;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        /* 소식지 페이지 컨테이너 */
+        .newsletter-page {
+            display: none; /* 기본은 숨김 처리 */
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 24px;
+            border: 2px solid #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        /* 활성화된 소식지만 노출 */
+        .newsletter-page.active {
+            display: block;
+        }
+
+        /* 공통 표 스타일 */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px double #000;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .main-date {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .doc-table th, .doc-table td {
+            border: 1px solid #333;
+            padding: 8px 10px;
+            vertical-align: top;
+            word-break: keep-all;
+        }
+
+        .table-header {
+            background-color: #e2e8f0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .dept-col {
+            width: 110px;
+            background-color: #f1f5f9;
+            text-align: center;
+            font-weight: 700;
+            vertical-align: middle !important;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .danger-title {
+            color: #dc2626;
+        }
+
+        .content-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-list li {
+            position: relative;
+            padding-left: 14px;
+            margin-bottom: 3px;
+        }
+
+        .content-list li::before {
+            content: "○";
+            position: absolute;
+            left: 0;
+            font-size: 12px;
+        }
+
+        .content-list li.bullet-dash::before { content: "-"; }
+
+        .highlight-red {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .inner-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6px 0;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .inner-table th, .inner-table td {
+            border: 1px solid #666;
+            padding: 4px;
+        }
+
+        .inner-table th {
+            background-color: #f8fafc;
+        }
+
+        .stamp-box {
+            position: absolute;
+            bottom: 35px;
+            right: 35px;
+            width: 130px;
+            height: 130px;
+            border: 3px double #1d4ed8;
+            border-radius: 50%;
+            color: #1d4ed8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            transform: rotate(-12deg);
+            opacity: 0.85;
+            pointer-events: none;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stamp-box div {
+            border-bottom: 1px solid #1d4ed8;
+            width: 80%;
+            text-align: center;
+            padding: 2px 0;
+        }
+
+        .stamp-box div:last-child {
+            border-bottom: none;
+        }
+
+        @media print {
+            .select-controller { display: none; }
+            body { background-color: #fff; padding: 0; }
+            .newsletter-page { display: block !important; page-break-after: always; box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 상단 소식지 선택 드롭다운 -->
+    <div class="select-controller">
+        <label for="newsletter-select">📄 소식지 회차 선택:</label>
+        <select id="newsletter-select" onchange="changeNewsletter(this.value)">
+            <option value="news-20260831">2026.08.31 (월) 소식지</option>
+            <option value="news-20260907">2026.09.07 (월) 소식지 [예시]</option>
+        </select>
+    </div>
+
+    <!-- ================= 1번 소식지 (2026.08.31) ================= -->
+    <div id="news-20260831" class="newsletter-page active">
+        <div class="main-header">
+            <div class="main-title">소 식 지</div>
+            <div class="main-date">2026.08.31 (월)</div>
+        </div>
+
+        <table class="doc-table">
+            <thead>
+                <tr>
+                    <th class="dept-col">부서</th>
+                    <th class="table-header">지난주 소식</th>
+                    <th class="table-header">이번주 소식</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="dept-col">총무부</td>
+                    <td>
+                        <div class="section-title">■ 안양소방서 주관 화재대비훈련 실시</div>
+                        <ul class="content-list">
+                            <li>전기버스 화재 방지 대응 목적</li>
+                            <li>8.26(수) 14:00 ~ 16:00 (석수공영차고지)</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="section-title">■ 안양똑버스01번 정류장 추가 안내</div>
+                        <ul class="content-list">
+                            <li>운행 개시일 : 즉시</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="dept-col" style="background-color: #fee2e2; color: #dc2626;">공지사항</td>
+                    <td colspan="2" style="background-color: #fef2f2;">
+                        <div class="section-title danger-title">🚨 휠체어 장애인 승차거부(9-3번) : 국가인권위원회 진정 접수</div>
+                        <ul class="content-list">
+                            <li class="highlight-red">★ 반드시 정차 후 내려서 리프트 사용 협조 및 승차 조치할 것</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="stamp-box">
+            <div>허가제 96호</div>
+            <div>26. 9. 4 까지</div>
+            <div>총 무 부</div>
+        </div>
+    </div>
+
+    <!-- ================= 2번 소식지 (추가할 새로운 소식지 양식) ================= -->
+    <div id="news-20260907" class="newsletter-page">
+        <div class="main-header">
+            <div class="main-title">소 식 지</div>
+            <div class="main-date">2026.09.07 (월)</div>
+        </div>
+
+        <table class="doc-table">
+            <thead>
+                <tr>
+                    <th class="dept-col">부서</th>
+                    <th class="table-header">지난주 소식</th>
+                    <th class="table-header">이번주 소식</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="dept-col">총무부</td>
+                    <td>
+                        <div class="section-title">■ 사내 정기 청소 실시</div>
+                        <ul class="content-list">
+                            <li>본사 및 각 영업소 청결 유지</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="section-title">■ 신규 차량 입고 점검</div>
+                        <ul class="content-list">
+                            <li>신규 전기버스 5대 순차 배치 예정</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="dept-col" style="background-color: #fee2e2; color: #dc2626;">공지사항</td>
+                    <td colspan="2" style="background-color: #fef2f2;">
+                        <div class="section-title danger-title">🚨 서행 운행 및 안전거리 확보 당부</div>
+                        <ul class="content-list">
+                            <li class="highlight-red">빗길 운행 시 평소 대비 20% 감속 운행 준수</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="stamp-box">
+            <div>허가제 97호</div>
+            <div>26. 9. 11 까지</div>
+            <div>총 무 부</div>
+        </div>
+    </div>
+
+    <!-- 자바스크립트: 소식지 전환 기능 -->
+    <script>
+        function changeNewsletter(selectedId) {
+            // 모든 소식지 페이지 숨김
+            const pages = document.querySelectorAll('.newsletter-page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // 선택한 소식지만 표시
+            const targetPage = document.getElementById(selectedId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 소식지 게시판</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Pretendard Variable", sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            padding: 32px 16px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* 1. 상단 신규 등록 패널 (관리자 영역) */
+        .admin-panel {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 32px;
+        }
+
+        .admin-panel h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 180px 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-grid input[type="date"], .input-grid input[type="file"] {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        .btn-submit {
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover { background-color: #1d4ed8; }
+
+        /* 2. 메인 사각형 썸네일 그리드 (사용자 공개 영역) */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title { font-size: 22px; font-weight: 800; color: #0f172a; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 24px;
+        }
+
+        .news-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(37, 99, 235, 0.15);
+        }
+
+        /* 날짜를 상단으로 이동한 헤더 영역 */
+        .card-top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-date {
+            font-weight: 800;
+            font-size: 15px;
+            color: #1e293b;
+        }
+
+        .card-actions { display: flex; gap: 4px; }
+
+        .btn-icon {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 3px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-icon:hover { background: #e2e8f0; }
+
+        .thumb-wrapper {
+            width: 100%;
+            height: 280px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+            background-color: #f8fafc;
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-view {
+            margin-top: 12px;
+            width: 100%;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-view:hover { background-color: #dbeafe; }
+
+        /* 3. 전체 화면 보기 팝업 (모달) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 40px 16px;
+        }
+
+        .modal-content {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 28px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title { font-size: 22px; font-weight: 800; }
+
+        .modal-close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-close:hover { color: #0f172a; }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .page-container img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-print {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-print:hover { background-color: #047857; }
+
+        @media print {
+            .admin-panel, .section-header, .card-actions, .modal-close, .btn-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
+            .modal-content { box-shadow: none; padding: 0; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. 상단 신규 등록 패널 -->
+        <div class="admin-panel">
+            <h2>➕ 신규 주간 소식지 등록</h2>
+            <div class="input-grid">
+                <input type="date" id="news-date">
+                <input type="file" id="news-files" accept="image/*" multiple>
+                <button class="btn-submit" onclick="addNewsletter()">등록하기</button>
+            </div>
+        </div>
+
+        <!-- 2. 메인 썸네일 카드 목록 -->
+        <div class="section-header">
+            <div class="section-title">📰 발행 소식지 목록</div>
+        </div>
+        <div id="card-grid" class="card-grid">
+            <!-- 소식지 카드가 여기에 추가됩니다 -->
+        </div>
+    </div>
+
+    <!-- 3. 전체 화면 보기 모달 -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">주간 소식지</div>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <div id="page-container" class="page-container">
+                <!-- 원본 이미지가 세로로 출력됩니다 -->
+            </div>
+
+            <button class="btn-print" onclick="window.print()">🖨️ 이 소식지 전체 인쇄 / PDF 저장</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('news-date').value = today;
+        };
+
+        function formatDateWithDay(dateString) {
+            if (!dateString) return '';
+            const days = ['일', '월', '화', '수', '목', '금', '토'];
+            const date = new Date(dateString + 'T00:00:00');
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const dayName = days[date.getDay()];
+            return `${y}.${m}.${d}(${dayName})`;
+        }
+
+        function addNewsletter() {
+            const dateVal = document.getElementById('news-date').value;
+            const fileInput = document.getElementById('news-files');
+
+            if (!dateVal) {
+                alert("발행일자를 선택해 주세요.");
+                return;
+            }
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("소식지 이미지 파일을 선택해 주세요.");
+                return;
+            }
+
+            const files = Array.from(fileInput.files);
+            const imageUrls = [];
+            let loadedCount = 0;
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageUrls[index] = e.target.result;
+                    loadedCount++;
+
+                    if (loadedCount === files.length) {
+                        createCard(dateVal, imageUrls);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function createCard(dateVal, images) {
+            const grid = document.getElementById('card-grid');
+            const card = document.createElement('div');
+            card.className = 'news-card';
+
+            const formattedDate = formatDateWithDay(dateVal);
+            const imagesJson = JSON.stringify(images).replace(/"/g, '&quot;');
+
+            card.innerHTML = `
+                <div class="card-top-header">
+                    <span class="card-date">🗓️ ${formattedDate}</span>
+                    <div class="card-actions">
+                        <button class="btn-icon" onclick="editDate(this)">✏️</button>
+                        <button class="btn-icon" onclick="deleteCard(this)">🗑️</button>
+                    </div>
+                </div>
+                <div class="thumb-wrapper" onclick="openModal('${formattedDate}', ${imagesJson})">
+                    <img src="${images[0]}" class="thumb-img" alt="${formattedDate} 소식지">
+                </div>
+                <button class="btn-view" onclick="openModal('${formattedDate}', ${imagesJson})">📖 크게 보기</button>
+            `;
+
+            grid.prepend(card);
+        }
+
+        function editDate(btn) {
+            const dateSpan = btn.closest('.card-top-header').querySelector('.card-date');
+            const currentDateText = dateSpan.innerText.replace('🗓️ ', '');
+            const newDate = prompt("수정할 날짜를 입력하세요 (예: 2026.09.04):", currentDateText);
+            
+            if (newDate && newDate.trim() !== "") {
+                dateSpan.innerText = `🗓️ ${newDate.trim()}`;
+            }
+        }
+
+        function deleteCard(btn) {
+            if (confirm("이 소식지를 삭제하시겠습니까?")) {
+                const card = btn.closest('.news-card');
+                card.remove();
+            }
+        }
+
+        function openModal(dateText, images) {
+            document.getElementById('modal-title').innerText = `${dateText} 주간 소식지`;
+            const container = document.getElementById('page-container');
+            container.innerHTML = '';
+
+            images.forEach((src, idx) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = `${dateText} - ${idx + 1}페이지`;
+                container.appendChild(img);
+            });
+
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

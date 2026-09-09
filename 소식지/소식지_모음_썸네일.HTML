@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소식지 텍스트 자동 변환기</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
+            background-color: #f0f0f0;
+            color: #111;
+            padding: 20px 10px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* 텍스트 소스 입력 패널 */
+        .input-panel {
+            max-width: 850px;
+            margin: 0 auto 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .input-panel h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .input-group input {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            flex: 1;
+        }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: monospace, sans-serif;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-generate {
+            background-color: #1d4ed8;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-generate:hover { background-color: #1e40af; }
+
+        .btn-print {
+            background-color: #059669;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-print:hover { background-color: #047857; }
+
+        /* A4 규격 출력 페이지 */
+        .page {
+            display: none; /* 생성 버튼 클릭 전에는 숨김 */
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 24px;
+            border: 2px solid #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px double #000;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .main-date {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .doc-table th, .doc-table td {
+            border: 1px solid #333;
+            padding: 8px 10px;
+            vertical-align: top;
+            word-break: keep-all;
+        }
+
+        .table-header {
+            background-color: #e2e8f0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .dept-col {
+            width: 110px;
+            background-color: #f1f5f9;
+            text-align: center;
+            font-weight: 700;
+            vertical-align: middle !important;
+            font-size: 16px;
+        }
+
+        .content-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-list li {
+            position: relative;
+            padding-left: 14px;
+            margin-bottom: 4px;
+        }
+
+        .content-list li::before {
+            content: "○";
+            position: absolute;
+            left: 0;
+            font-size: 12px;
+        }
+
+        .stamp-box {
+            position: absolute;
+            bottom: 35px;
+            right: 35px;
+            width: 130px;
+            height: 130px;
+            border: 3px double #1d4ed8;
+            border-radius: 50%;
+            color: #1d4ed8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            transform: rotate(-12deg);
+            opacity: 0.85;
+            pointer-events: none;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stamp-box div {
+            border-bottom: 1px solid #1d4ed8;
+            width: 80%;
+            text-align: center;
+            padding: 2px 0;
+        }
+
+        .stamp-box div:last-child { border-bottom: none; }
+
+        @media print {
+            .input-panel { display: none; }
+            body { background-color: #fff; padding: 0; }
+            .page { display: block !important; box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 소스 입력 패널 -->
+    <div class="input-panel">
+        <h2>📝 소식지 텍스트 소스 입력란</h2>
+        <div class="input-group">
+            <input type="text" id="doc-date" value="2026.08.31 (월)" placeholder="발행일자 입력 (예: 2026.09.07)">
+        </div>
+        <textarea id="raw-text" placeholder="여기에 소식지 텍스트(부서명, 내용 등)를 자유롭게 붙여넣으세요..."></textarea>
+        <div class="btn-group">
+            <button class="btn-generate" onclick="generateNewsletter()">✨ 소식지 생성하기</button>
+            <button class="btn-print" onclick="window.print()">🖨️ 이 소식지 인쇄 / PDF 저장</button>
+        </div>
+    </div>
+
+    <!-- 생성된 소식지 화면 -->
+    <div id="newsletter-paper" class="page">
+        <div class="main-header">
+            <div class="main-title">소 식 지</div>
+            <div id="display-date" class="main-date">2026.08.31 (월)</div>
+        </div>
+
+        <table class="doc-table">
+            <thead>
+                <tr>
+                    <th class="dept-col">부서</th>
+                    <th class="table-header">주요 내용 및 소식</th>
+                </tr>
+            </thead>
+            <tbody id="newsletter-tbody">
+                <!-- 자바스크립트로 자동 삽입되는 영역 -->
+            </tbody>
+        </table>
+
+        <div class="stamp-box">
+            <div>허가제 96호</div>
+            <div>26. 9. 4 까지</div>
+            <div>총 무 부</div>
+        </div>
+    </div>
+
+    <script>
+        function generateNewsletter() {
+            const rawText = document.getElementById('raw-text').value.trim();
+            const inputDate = document.getElementById('doc-date').value.trim();
+            const tbody = document.getElementById('newsletter-tbody');
+
+            if (!rawText) {
+                alert("소식지 텍스트 소스를 입력해 주세요.");
+                return;
+            }
+
+            // 날짜 반영
+            document.getElementById('display-date').innerText = inputDate || '2026.08.31 (월)';
+            tbody.innerHTML = ''; // 기존 내용 초기화
+
+            // 줄바꿈 기준으로 파싱
+            const lines = rawText.split('\n');
+            let currentDept = "안내";
+            let deptData = {};
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                // 부서 구분키 단어 탐지 (총무부, 인사노무부, 운행본부 등)
+                if (line.endsWith('부') || line.endsWith('본부') || line.includes('공지')) {
+                    currentDept = line;
+                    if (!deptData[currentDept]) deptData[currentDept] = [];
+                } else {
+                    if (!deptData[currentDept]) deptData[currentDept] = [];
+                    deptData[currentDept].push(line);
+                }
+            });
+
+            // 테이블 행 생성
+            for (const [dept, contents] of Object.entries(deptData)) {
+                const tr = document.createElement('tr');
+                const isNotice = dept.includes('공지');
+
+                const deptTd = `<td class="dept-col" ${isNotice ? 'style="background-color: #fee2e2; color: #dc2626;"' : ''}>${dept}</td>`;
+                const contentTd = `
+                    <td ${isNotice ? 'style="background-color: #fef2f2;"' : ''}>
+                        <ul class="content-list" ${isNotice ? 'style="color: #dc2626; font-weight: 700;"' : ''}>
+                            ${contents.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </td>
+                `;
+
+                tr.innerHTML = deptTd + contentTd;
+                tbody.appendChild(tr);
+            }
+
+            // 결과 화면 노출
+            document.getElementById('newsletter-paper').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
