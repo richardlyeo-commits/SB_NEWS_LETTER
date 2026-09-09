@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260909_4)</title>
+    <title>삼영보영 주간 소식지 (20260909_5)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
@@ -14,7 +14,7 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-2xl font-bold text-slate-900">삼영보영 주간 소식지</h1>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_4</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">20260909_5</span>
                 </div>
                 <p class="text-slate-500 text-sm mt-1">항목을 클릭하시면 소식지 원본을 열람하실 수 있습니다.</p>
             </div>
@@ -32,7 +32,7 @@
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-slate-900">새 소식지 등록</h2>
-                <span class="text-xs text-slate-400">System 20260909_4</span>
+                <span class="text-xs text-slate-400">System 20260909_5</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -47,7 +47,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">소식지 파일 (PDF 또는 이미지)</label>
                     <input type="file" id="newsFile" accept="image/*,application/pdf" multiple required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-                    <p class="text-xs text-slate-400 mt-1">* 용량 최적화를 위해 이미지 압축 후 저장됩니다.</p>
+                    <p class="text-xs text-slate-400 mt-1">* PDF 파일은 이미지로 변환 후 중앙 서버에 등록됩니다.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4">
@@ -60,38 +60,47 @@
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const STORAGE_KEY = "SYBY_NEWSLETTERS_DATA";
+        
+        // ⚠️ 여기에 새로 배포한 구글 앱스 스크립트 웹 앱 URL을 붙여넣으세요.
+        const API_URL = "YOUR_GAS_WEB_APP_URL"; 
+        let globalNewsData = [];
 
         window.addEventListener('DOMContentLoaded', loadNewsletters);
 
-        function loadNewsletters() {
+        async function loadNewsletters() {
             const listContainer = document.getElementById('newsletterList');
-            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-            if (data.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
+            if (!API_URL || API_URL === "YOUR_GAS_WEB_APP_URL") {
+                listContainer.innerHTML = `<div class="text-center py-12 text-rose-500">API_URL 설정이 누락되었습니다. 코드 내 API_URL을 입력해 주세요.</div>`;
                 return;
             }
 
-            data.sort((a, b) => new Date(b.date) - new Date(a.date));
+            try {
+                const response = await fetch(API_URL);
+                globalNewsData = await response.json();
 
-            listContainer.innerHTML = data.map((item, index) => `
-                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">${item.date}</span>
-                        ${index === 0 ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>' : ''}
-                        <h2 class="font-medium text-slate-800">${item.title}</h2>
-                    </div>
-                    <div class="flex items-center gap-2">
+                if (!globalNewsData || globalNewsData.length === 0) {
+                    listContainer.innerHTML = `<div class="text-center py-12 text-slate-400">등록된 소식지가 없습니다.</div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = globalNewsData.map((item, index) => `
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center justify-between hover:border-emerald-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-md">${item.date}</span>
+                            ${index === 0 ? '<span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>' : ''}
+                            <h2 class="font-medium text-slate-800">${item.title}</h2>
+                        </div>
                         <button onclick="viewNewsletter('${item.id}')" class="bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 text-sm px-3 py-1.5 rounded-lg transition-colors font-medium">
                             🔍 보기
                         </button>
-                        <button onclick="deleteNewsletter('${item.id}')" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-400 text-sm px-2.5 py-1.5 rounded-lg transition-colors">
-                            🗑️
-                        </button>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+
+            } catch (error) {
+                console.error("목록 불러오기 오류:", error);
+                listContainer.innerHTML = `<div class="text-center py-12 text-rose-500">소식지 목록을 불러오지 못했습니다.</div>`;
+            }
         }
 
         function openModal() {
@@ -117,51 +126,47 @@
             if (fileInput.files.length === 0) return;
 
             submitBtn.disabled = true;
-            submitBtn.innerText = "파일 변환 및 압축 중...";
+            submitBtn.innerText = "파일 변환 및 업로드 중...";
 
             try {
-                let images = [];
+                let files = [];
 
                 for (const file of fileInput.files) {
                     if (file.type === 'application/pdf') {
                         const pdfImages = await convertPdfToImages(file);
-                        images.push(...pdfImages);
+                        files.push(...pdfImages);
                     } else if (file.type.startsWith('image/')) {
-                        const compressedImage = await compressImage(file);
-                        images.push(compressedImage);
+                        const base64Data = await readImageAsBase64(file);
+                        files.push(base64Data);
                     }
                 }
 
-                const newItem = {
-                    id: Date.now().toString(),
+                const payload = {
                     date: date,
                     title: title,
-                    images: images
+                    files: files
                 };
 
-                const existingData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-                existingData.push(newItem);
-                
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(existingData));
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
                 alert("소식지가 성공적으로 등록되었습니다!");
                 closeModal();
-                loadNewsletters();
+                setTimeout(loadNewsletters, 1500); // 서버 반영 시간 고려 후 목록 새로고침
 
             } catch (error) {
                 console.error("등록 실패:", error);
-                if (error.name === 'QuotaExceededError' || error.code === 22) {
-                    alert("브라우저 저장 용량이 가득 찼습니다. 기존 소식지를 일부 삭제한 후 다시 시도해 주세요.");
-                } else {
-                    alert("소식지 등록 중 오류가 발생했습니다.");
-                }
+                alert("등록 처리 중 오류가 발생했습니다.");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = "소식지 등록하기";
             }
         }
 
-        // PDF 해상도 축소 및 압축 (용량 절감)
         async function convertPdfToImages(file) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -169,7 +174,7 @@
 
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 1.0 }); // 스케일 조절
+                const viewport = page.getViewport({ scale: 1.2 });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
 
@@ -177,46 +182,23 @@
                 canvas.width = viewport.width;
 
                 await page.render({ canvasContext: context, viewport: viewport }).promise;
-                images.push(canvas.toDataURL('image/jpeg', 0.6)); // Quality 0.6으로 압축
+                images.push(canvas.toDataURL('image/jpeg', 0.7));
             }
             return images;
         }
 
-        // 이미지 파일 압축
-        function compressImage(file) {
-            return new Promise((resolve) => {
+        function readImageAsBase64(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        let width = img.width;
-                        let height = img.height;
-                        const maxWidth = 1200; // 최대 너비 제한
-
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        resolve(canvas.toDataURL('image/jpeg', 0.6));
-                    };
-                    img.src = e.target.result;
-                };
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
 
         function viewNewsletter(id) {
-            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-            const item = data.find(i => i.id === id);
-            if (!item) return;
+            const item = globalNewsData.find(i => i.id === id);
+            if (!item || !item.files) return;
 
             const win = window.open("", "_blank");
             win.document.write(`
@@ -229,18 +211,10 @@
                     </style>
                 </head>
                 <body>
-                    ${item.images.map(img => `<img src="${img}" />`).join('')}
+                    ${item.files.map(img => `<img src="${img}" />`).join('')}
                 </body>
                 </html>
             `);
-        }
-
-        function deleteNewsletter(id) {
-            if (!confirm("정말 이 소식지를 삭제하시겠습니까?")) return;
-            let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-            data = data.filter(i => i.id !== id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            loadNewsletters();
         }
     </script>
 </body>
