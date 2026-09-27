@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-7)</title>
+    <title>삼영보영 주간 소식지 (20260927-8)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -15,13 +15,14 @@
 </head>
 <body class="bg-gray-50 text-slate-800 min-h-screen">
 
+    <!-- 상단 헤더 -->
     <header class="bg-[#01794c] text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-7</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-8</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -37,14 +38,31 @@
         </div>
     </header>
 
+    <!-- 메인 콘텐츠 -->
     <main class="max-w-5xl mx-auto px-4 py-8">
-        <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6 shadow-sm">
-            <p class="text-slate-600 text-sm leading-relaxed">
-                📌 <strong>삼영보영운수</strong>의 주간 소식지와 공지문을 언제 어디서나 확인하실 수 있습니다. 
-                신입 기사님들은 과거 소식지를 통해 회사 분위기와 시내버스 기사로서의 마음가짐을 익혀보세요.
-            </p>
+
+        <!-- 🌟 새로 디자인된 세련된 안내 배너 🌟 -->
+        <div class="bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/30 rounded-2xl border border-emerald-100 p-5 md:p-6 mb-6 shadow-sm relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#01794c]/5 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex items-start gap-3.5">
+                <div class="bg-[#01794c]/10 text-[#01794c] p-2.5 rounded-xl shrink-0 mt-0.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="space-y-1.5">
+                    <h3 class="font-bold text-slate-900 text-base md:text-lg flex items-center gap-2">
+                        삼영·보영운수 디지털 아카이브 포털
+                    </h3>
+                    <p class="text-slate-600 text-sm md:text-base leading-relaxed">
+                        주간 소식지와 전달 공지사항을 언제 어디서나 간편하게 확인하실 수 있습니다. 
+                        <span class="text-[#01794c] font-semibold">신입 승무원(기사님)</span>들께서는 지난 소식지를 살펴보시며 안전 운행 철학과 회사 문화를 익혀보세요.
+                    </p>
+                </div>
+            </div>
         </div>
 
+        <!-- 검색창 -->
         <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4 shadow-sm">
             <div class="relative">
                 <input type="text" id="searchInput" placeholder="날짜, 제목, 내용으로 검색하세요..." class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
@@ -54,11 +72,13 @@
             </div>
         </div>
 
+        <!-- 탭 -->
         <div class="flex gap-2 mb-6">
             <button id="tab-newsletters" onclick="switchTab('newsletters')" class="tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">📰 주간 소식지</button>
             <button id="tab-notices" onclick="switchTab('notices')" class="tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">📢 공지사항</button>
         </div>
 
+        <!-- 소식지/공지문 목록 -->
         <div id="contentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div class="col-span-full text-center py-12 text-slate-400">데이터를 불러오는 중입니다...</div>
         </div>
@@ -74,7 +94,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-7</span>
+                <span class="text-xs text-slate-400">Ver 20260927-8</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
@@ -99,7 +119,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-7</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-8</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -141,6 +161,7 @@
         </div>
     </div>
 
+    <!-- 푸터 -->
     <footer class="bg-slate-100 border-t border-slate-200 mt-12">
         <div class="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-slate-500">
             <p>삼영·보영운수(주) | 경기도 안양시 만안구 석수동 557-7 안양석수공영차고지 시내버스동</p>
@@ -179,7 +200,6 @@
                 if (!Array.isArray(newslettersData)) newslettersData = [];
                 if (!Array.isArray(noticesData)) noticesData = [];
 
-                // 모든 항목의 id를 문자열로 보장
                 newslettersData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
                 noticesData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
 
