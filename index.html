@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-11)</title>
+    <title>삼영보영 주간 소식지 (20260927-13)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -22,7 +22,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-11</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-13</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -94,12 +94,13 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-11</span>
+                <span class="text-xs text-slate-400">Ver 20260927-13</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">관리자 비밀번호</label>
-                    <input type="password" id="adminPasswordInput" placeholder="비밀번호 입력 (6666)" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                    <!-- 요청하신 대로 예: 1234 형태의 가이드 문구로 변경 -->
+                    <input type="password" id="adminPasswordInput" autocomplete="new-password" placeholder="비밀번호 입력 (예: 1234)" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">GitHub Personal Access Token</label>
@@ -119,7 +120,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-11</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-13</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -170,7 +171,6 @@
     </footer>
 
     <script>
-        // 🔑 요청하신 비밀번호로 설정되었습니다.
         const ADMIN_PASSWORD = "6666";
         const GITHUB_OWNER = 'richardlyeo-commits';
 
@@ -180,7 +180,6 @@
         let pendingAction = null; 
         let targetEditItem = null;
 
-        // 발행일자에 따라 커밋할 저장소 결정
         function getRepoByDate(dateStr) {
             if (!dateStr) return 'SB_NEWS_LETTER';
             const year = parseInt(dateStr.substring(0, 4), 10);
@@ -207,8 +206,8 @@
                 if (!Array.isArray(newslettersData)) newslettersData = [];
                 if (!Array.isArray(noticesData)) noticesData = [];
 
-                newslettersData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
-                noticesData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
+                newslettersData.forEach((item, idx) => { item.id = item.id !== undefined ? String(item.id) : `news_${idx}`; });
+                noticesData.forEach((item, idx) => { item.id = item.id !== undefined ? String(item.id) : `notice_${idx}`; });
 
                 newslettersData.sort((a, b) => new Date(b.date) - new Date(a.date));
                 noticesData.sort((a, b) => {
@@ -286,8 +285,8 @@
                                 </span>
                                 <div class="flex items-center gap-1">
                                     ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold mr-1">NEW</span>' : ''}
-                                    <button data-action="edit" data-id="${item.id}" class="action-btn text-slate-400 hover:text-[#01794c] p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="수정">✏️</button>
-                                    <button data-action="delete" data-id="${item.id}" class="action-btn text-slate-400 hover:text-red-500 p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="삭제">🗑️</button>
+                                    <button data-action="edit" data-id="${escapeHtml(item.id)}" class="action-btn text-slate-400 hover:text-[#01794c] p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="수정">✏️</button>
+                                    <button data-action="delete" data-id="${escapeHtml(item.id)}" class="action-btn text-slate-400 hover:text-red-500 p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="삭제">🗑️</button>
                                 </div>
                             </div>
                             <h2 class="font-bold text-slate-900 text-lg mb-2 leading-tight">${escapeHtml(item.title)}</h2>
@@ -399,8 +398,12 @@
         function handleEditClick(id) {
             const data = getCurrentData();
             const item = data.find(i => String(i.id) === String(id));
-            if (!item) return;
+            if (!item) {
+                alert("선택한 항목의 정보를 찾을 수 없습니다.");
+                return;
+            }
 
+            targetEditItem = item;
             const token = localStorage.getItem('sb_gh_token');
             if (token) {
                 openUploadModal(true, item);
@@ -414,6 +417,7 @@
             const item = data.find(i => String(i.id) === String(id));
             if (!item) return;
 
+            targetEditItem = item;
             if (!confirm(`'${item.title}' 항목을 정말 삭제하시겠습니까?`)) return;
 
             const token = localStorage.getItem('sb_gh_token');
@@ -429,7 +433,6 @@
             const fileNotice = document.getElementById('fileChangeNotice');
             const fileInput = document.getElementById('postFile');
 
-            // 폼 필드와 전역 선택 객체 완벽 초기화
             document.getElementById('uploadForm').reset();
             targetEditItem = item;
 
