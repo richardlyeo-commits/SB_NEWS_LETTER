@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-6)</title>
+    <title>삼영보영 주간 소식지 (20260927-7)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -21,7 +21,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-6</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-7</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -74,7 +74,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-6</span>
+                <span class="text-xs text-slate-400">Ver 20260927-7</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
@@ -99,7 +99,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-6</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-7</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -178,6 +178,10 @@
 
                 if (!Array.isArray(newslettersData)) newslettersData = [];
                 if (!Array.isArray(noticesData)) noticesData = [];
+
+                // 모든 항목의 id를 문자열로 보장
+                newslettersData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
+                noticesData.forEach(item => { if (item.id !== undefined) item.id = String(item.id); });
 
                 newslettersData.sort((a, b) => new Date(b.date) - new Date(a.date));
                 noticesData.sort((a, b) => {
@@ -272,13 +276,12 @@
                 `;
             }).join('');
 
-            // 이벤트 바인딩 등록
             document.querySelectorAll('.action-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     const action = this.getAttribute('data-action');
-                    const id = this.getAttribute('data-id');
+                    const id = String(this.getAttribute('data-id'));
                     if (action === 'edit') {
                         handleEditClick(id);
                     } else if (action === 'delete') {
@@ -368,7 +371,7 @@
 
         function handleEditClick(id) {
             const data = getCurrentData();
-            const item = data.find(i => i.id === String(id));
+            const item = data.find(i => String(i.id) === String(id));
             if (!item) return;
 
             const token = localStorage.getItem('sb_gh_token');
@@ -381,10 +384,10 @@
 
         function handleDeleteClick(id) {
             const data = getCurrentData();
-            const item = data.find(i => i.id === String(id));
+            const item = data.find(i => String(i.id) === String(id));
             if (!item) return;
 
-            if (!confirm(`'${item.title}' 항목을 gerçekten 삭제하시겠습니까?`)) return;
+            if (!confirm(`'${item.title}' 항목을 정말 삭제하시겠습니까?`)) return;
 
             const token = localStorage.getItem('sb_gh_token');
             if (token) {
@@ -404,7 +407,7 @@
 
             if (isEdit && item) {
                 modalTitle.innerText = "소식지/공지 수정";
-                document.getElementById('editItemId').value = item.id;
+                document.getElementById('editItemId').value = String(item.id);
                 document.getElementById('postCategory').value = currentTab;
                 document.getElementById('postDate').value = item.date || new Date().toISOString().substring(0, 10);
                 document.getElementById('postTitle').value = item.title || '';
