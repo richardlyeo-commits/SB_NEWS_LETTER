@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-5)</title>
+    <title>삼영보영 주간 소식지 (20260927-6)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -21,7 +21,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-5</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-6</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -74,7 +74,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-5</span>
+                <span class="text-xs text-slate-400">Ver 20260927-6</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
@@ -99,7 +99,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-5</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-6</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -149,7 +149,6 @@
     </footer>
 
     <script>
-        // 🔑 관리자 비밀번호 (필요시 변경하세요)
         const ADMIN_PASSWORD = "6666";
         const GITHUB_OWNER = 'richardlyeo-commits';
         const GITHUB_REPO = 'SB_NEWS_LETTER';
@@ -256,8 +255,8 @@
                                 </span>
                                 <div class="flex items-center gap-1">
                                     ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold mr-1">NEW</span>' : ''}
-                                    <button onclick="triggerEdit(event, '${item.id}')" class="text-slate-400 hover:text-[#01794c] p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="수정">✏️</button>
-                                    <button onclick="triggerDelete(event, '${item.id}')" class="text-slate-400 hover:text-red-500 p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="삭제">🗑️</button>
+                                    <button data-action="edit" data-id="${item.id}" class="action-btn text-slate-400 hover:text-[#01794c] p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="수정">✏️</button>
+                                    <button data-action="delete" data-id="${item.id}" class="action-btn text-slate-400 hover:text-red-500 p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="삭제">🗑️</button>
                                 </div>
                             </div>
                             <h2 class="font-bold text-slate-900 text-lg mb-2 leading-tight">${escapeHtml(item.title)}</h2>
@@ -272,6 +271,21 @@
                     </div>
                 `;
             }).join('');
+
+            // 이벤트 바인딩 등록
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const action = this.getAttribute('data-action');
+                    const id = this.getAttribute('data-id');
+                    if (action === 'edit') {
+                        handleEditClick(id);
+                    } else if (action === 'delete') {
+                        handleDeleteClick(id);
+                    }
+                });
+            });
         }
 
         function formatDate(dateStr) {
@@ -352,10 +366,9 @@
             }
         }
 
-        function triggerEdit(e, id) {
-            if (e) e.stopPropagation();
+        function handleEditClick(id) {
             const data = getCurrentData();
-            const item = data.find(i => i.id === id);
+            const item = data.find(i => i.id === String(id));
             if (!item) return;
 
             const token = localStorage.getItem('sb_gh_token');
@@ -366,10 +379,9 @@
             }
         }
 
-        function triggerDelete(e, id) {
-            if (e) e.stopPropagation();
+        function handleDeleteClick(id) {
             const data = getCurrentData();
-            const item = data.find(i => i.id === id);
+            const item = data.find(i => i.id === String(id));
             if (!item) return;
 
             if (!confirm(`'${item.title}' 항목을 gerçekten 삭제하시겠습니까?`)) return;
@@ -473,7 +485,7 @@
                 const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
                 if (editId) {
-                    const idx = currentData.findIndex(i => i.id === editId);
+                    const idx = currentData.findIndex(i => String(i.id) === String(editId));
                     if (idx !== -1) {
                         currentData[idx] = {
                             ...currentData[idx],
@@ -532,7 +544,7 @@
                 const decodedStr = decodeURIComponent(escape(atob(jsonInfo.content)));
                 let currentData = JSON.parse(decodedStr);
 
-                currentData = currentData.filter(i => i.id !== item.id);
+                currentData = currentData.filter(i => String(i.id) !== String(item.id));
 
                 const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
                 await uploadToGitHub(targetJson, updatedJsonBase64, `Delete item: ${item.title}`, jsonSha, token);
