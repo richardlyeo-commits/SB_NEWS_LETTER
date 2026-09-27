@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-4)</title>
+    <title>삼영보영 주간 소식지 (20260927-5)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -21,7 +21,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-4</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-5</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -69,17 +69,17 @@
         </div>
     </main>
 
-    <!-- 관리자 로그인 및 토큰 설정 모달 -->
+    <!-- 관리자 인증 모달 -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-4</span>
+                <span class="text-xs text-slate-400">Ver 20260927-5</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">관리자 비밀번호</label>
-                    <input type="password" id="adminPasswordInput" placeholder="6666" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                    <input type="password" id="adminPasswordInput" placeholder="비밀번호 입력 (기본: 1234)" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">GitHub Personal Access Token</label>
@@ -99,7 +99,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-4</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-5</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -130,7 +130,7 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">첨부 파일 (PDF / 이미지)</label>
                     <input type="file" id="postFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-[#01794c] hover:file:bg-emerald-100">
-                    <p id="fileChangeNotice" class="text-xs text-slate-400 mt-1 hidden">* 수정 시 파일 선택을 하지 않으면 기존 파일이 유지됩니다.</p>
+                    <p id="fileChangeNotice" class="text-xs text-slate-400 mt-1 hidden">* 수정 시 새로운 파일을 첨부하지 않으면 기존 파일이 그대로 유지됩니다.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4 border-t">
@@ -149,14 +149,15 @@
     </footer>
 
     <script>
-        const ADMIN_PASSWORD = "1234";
+        // 🔑 관리자 비밀번호 (필요시 변경하세요)
+        const ADMIN_PASSWORD = "6666";
         const GITHUB_OWNER = 'richardlyeo-commits';
         const GITHUB_REPO = 'SB_NEWS_LETTER';
 
         let newslettersData = [];
         let noticesData = [];
         let currentTab = 'newsletters';
-        let pendingAction = null; // 'create' | 'edit' | 'delete'
+        let pendingAction = null; 
         let targetEditItem = null;
 
         window.addEventListener('DOMContentLoaded', loadData);
@@ -255,8 +256,8 @@
                                 </span>
                                 <div class="flex items-center gap-1">
                                     ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold mr-1">NEW</span>' : ''}
-                                    <button onclick="triggerEdit('${item.id}')" class="text-slate-400 hover:text-[#01794c] p-1 text-xs font-medium" title="수정">✏️</button>
-                                    <button onclick="triggerDelete('${item.id}')" class="text-slate-400 hover:text-red-500 p-1 text-xs font-medium" title="삭제">🗑️</button>
+                                    <button onclick="triggerEdit(event, '${item.id}')" class="text-slate-400 hover:text-[#01794c] p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="수정">✏️</button>
+                                    <button onclick="triggerDelete(event, '${item.id}')" class="text-slate-400 hover:text-red-500 p-1.5 text-xs font-medium rounded hover:bg-slate-100" title="삭제">🗑️</button>
                                 </div>
                             </div>
                             <h2 class="font-bold text-slate-900 text-lg mb-2 leading-tight">${escapeHtml(item.title)}</h2>
@@ -351,7 +352,8 @@
             }
         }
 
-        function triggerEdit(id) {
+        function triggerEdit(e, id) {
+            if (e) e.stopPropagation();
             const data = getCurrentData();
             const item = data.find(i => i.id === id);
             if (!item) return;
@@ -364,7 +366,8 @@
             }
         }
 
-        function triggerDelete(id) {
+        function triggerDelete(e, id) {
+            if (e) e.stopPropagation();
             const data = getCurrentData();
             const item = data.find(i => i.id === id);
             if (!item) return;
@@ -441,7 +444,6 @@
             try {
                 let filePath = targetEditItem ? targetEditItem.file_url : '';
 
-                // 1. 새 파일 첨부 시 파일 업로드
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     const rawFilePath = `files/${Date.now()}_${file.name}`;
@@ -450,7 +452,6 @@
                     filePath = `./${rawFilePath}`;
                 }
 
-                // 2. Target JSON 파일 정보 조회
                 const targetJson = category === 'newsletters' ? 'newsletters.json' : 'notices.json';
                 let currentData = [];
                 let jsonSha = null;
@@ -472,7 +473,6 @@
                 const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
                 if (editId) {
-                    // 수정 모드
                     const idx = currentData.findIndex(i => i.id === editId);
                     if (idx !== -1) {
                         currentData[idx] = {
@@ -485,7 +485,6 @@
                         };
                     }
                 } else {
-                    // 등록 모드
                     const newItem = {
                         id: Date.now().toString(),
                         date: date,
@@ -497,7 +496,6 @@
                     currentData.push(newItem);
                 }
 
-                // 3. JSON 파일 GitHub 업데이트
                 const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
                 await uploadToGitHub(targetJson, updatedJsonBase64, `Update ${targetJson} for ${title}`, jsonSha, token);
 
