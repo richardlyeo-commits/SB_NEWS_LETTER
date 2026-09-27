@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-8)</title>
+    <title>삼영보영 주간 소식지 (20260927-10)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -22,7 +22,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-8</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-10</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -41,7 +41,7 @@
     <!-- 메인 콘텐츠 -->
     <main class="max-w-5xl mx-auto px-4 py-8">
 
-        <!-- 🌟 새로 디자인된 세련된 안내 배너 🌟 -->
+        <!-- 안내 배너 -->
         <div class="bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/30 rounded-2xl border border-emerald-100 p-5 md:p-6 mb-6 shadow-sm relative overflow-hidden">
             <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-[#01794c]/5 rounded-full blur-xl pointer-events-none"></div>
             <div class="flex items-start gap-3.5">
@@ -94,7 +94,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-8</span>
+                <span class="text-xs text-slate-400">Ver 20260927-10</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
@@ -119,7 +119,7 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-8</span>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-10</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
@@ -172,13 +172,19 @@
     <script>
         const ADMIN_PASSWORD = "6666";
         const GITHUB_OWNER = 'richardlyeo-commits';
-        const GITHUB_REPO = 'SB_NEWS_LETTER';
 
         let newslettersData = [];
         let noticesData = [];
         let currentTab = 'newsletters';
         let pendingAction = null; 
         let targetEditItem = null;
+
+        // 발행일자에 따라 커밋할 저장소 자동 결정하는 함수
+        function getRepoByDate(dateStr) {
+            if (!dateStr) return 'SB_NEWS_LETTER';
+            const year = parseInt(dateStr.substring(0, 4), 10);
+            return year >= 2027 ? 'SB_NEWS_2027' : 'SB_NEWS_LETTER';
+        }
 
         window.addEventListener('DOMContentLoaded', loadData);
 
@@ -473,6 +479,9 @@
             const tagsInput = document.getElementById('postTags').value;
             const fileInput = document.getElementById('postFile');
 
+            // 💡 작성된 날짜의 연도에 따라 Target 저장소 결정
+            const targetRepo = getRepoByDate(date);
+
             submitBtn.disabled = true;
             submitBtn.innerText = "저장 중...";
 
@@ -483,7 +492,7 @@
                     const file = fileInput.files[0];
                     const rawFilePath = `files/${Date.now()}_${file.name}`;
                     const base64Content = await readFileAsBase64(file);
-                    await uploadToGitHub(rawFilePath, base64Content, `Upload file: ${file.name}`, null, token);
+                    await uploadToGitHub(targetRepo, rawFilePath, base64Content, `Upload file: ${file.name}`, null, token);
                     filePath = `./${rawFilePath}`;
                 }
 
@@ -492,7 +501,7 @@
                 let jsonSha = null;
 
                 try {
-                    const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${targetJson}`, {
+                    const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${targetRepo}/contents/${targetJson}`, {
                         headers: { 'Authorization': `token ${token}` }
                     });
                     if (jsonRes.ok) {
@@ -532,9 +541,9 @@
                 }
 
                 const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
-                await uploadToGitHub(targetJson, updatedJsonBase64, `Update ${targetJson} for ${title}`, jsonSha, token);
+                await uploadToGitHub(targetRepo, targetJson, updatedJsonBase64, `Update ${targetJson} for ${title}`, jsonSha, token);
 
-                alert(editId ? "수정되었습니다!" : "성공적으로 등록되었습니다!");
+                alert(editId ? "수정되었습니다!" : `성공적으로 등록되었습니다! (${targetRepo} 저장소로 저장됨)`);
                 closeUploadModal();
                 loadData();
 
@@ -554,9 +563,11 @@
                 return;
             }
 
+            const targetRepo = getRepoByDate(item.date);
+
             try {
                 const targetJson = currentTab === 'newsletters' ? 'newsletters.json' : 'notices.json';
-                const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${targetJson}`, {
+                const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${targetRepo}/contents/${targetJson}`, {
                     headers: { 'Authorization': `token ${token}` }
                 });
 
@@ -570,7 +581,7 @@
                 currentData = currentData.filter(i => String(i.id) !== String(item.id));
 
                 const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
-                await uploadToGitHub(targetJson, updatedJsonBase64, `Delete item: ${item.title}`, jsonSha, token);
+                await uploadToGitHub(targetRepo, targetJson, updatedJsonBase64, `Delete item: ${item.title}`, jsonSha, token);
 
                 alert("삭제되었습니다!");
                 loadData();
@@ -580,8 +591,8 @@
             }
         }
 
-        async function uploadToGitHub(path, contentBase64, commitMessage, sha = null, token) {
-            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+        async function uploadToGitHub(repo, path, contentBase64, commitMessage, sha = null, token) {
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/contents/${path}`;
             const body = { message: commitMessage, content: contentBase64 };
             if (sha) body.sha = sha;
 
