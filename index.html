@@ -3,45 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지</title>
+    <title>삼영보영 주간 소식지 (20260927-3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         body { font-family: "Pretendard", sans-serif; }
-        .tab-active {
-            background-color: #01794c;
-            color: white;
-        }
-        .tab-inactive {
-            background-color: #f1f5f9;
-            color: #64748b;
-        }
-        .tab-inactive:hover {
-            background-color: #e2e8f0;
-        }
+        .tab-active { background-color: #01794c; color: white; }
+        .tab-inactive { background-color: #f1f5f9; color: #64748b; }
+        .tab-inactive:hover { background-color: #e2e8f0; }
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 min-h-screen">
 
-    <!-- 상단 헤더 -->
     <header class="bg-[#01794c] text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-3</span>
+                    </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
-                <div class="text-sm text-green-100">
-                    총 <span id="total-count" class="font-bold text-white text-lg">0</span>건
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-green-100">
+                        총 <span id="total-count" class="font-bold text-white text-lg">0</span>건
+                    </div>
+                    <button onclick="openAuthModal()" class="bg-white text-[#01794c] hover:bg-green-50 font-bold px-4 py-2 rounded-lg text-sm shadow transition-colors flex items-center gap-1">
+                        <span>🔒 관리자 작성</span>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- 메인 콘텐츠 -->
     <main class="max-w-5xl mx-auto px-4 py-8">
-
-        <!-- 안내 문구 -->
         <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6 shadow-sm">
             <p class="text-slate-600 text-sm leading-relaxed">
                 📌 <strong>삼영보영운수</strong>의 주간 소식지와 공지문을 언제 어디서나 확인하실 수 있습니다. 
@@ -49,45 +45,100 @@
             </p>
         </div>
 
-        <!-- 검색창 -->
         <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4 shadow-sm">
             <div class="relative">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="날짜, 제목, 내용으로 검색하세요..." 
-                    class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20"
-                >
+                <input type="text" id="searchInput" placeholder="날짜, 제목, 내용으로 검색하세요..." class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
                 <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
             </div>
         </div>
 
-        <!-- 탭 -->
         <div class="flex gap-2 mb-6">
-            <button id="tab-newsletters" onclick="switchTab('newsletters')" class="tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">
-                📰 주간 소식지
-            </button>
-            <button id="tab-notices" onclick="switchTab('notices')" class="tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">
-                📢 공지사항
-            </button>
+            <button id="tab-newsletters" onclick="switchTab('newsletters')" class="tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">📰 주간 소식지</button>
+            <button id="tab-notices" onclick="switchTab('notices')" class="tab-inactive flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors">📢 공지사항</button>
         </div>
 
-        <!-- 소식지/공지문 목록 -->
         <div id="contentList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div class="col-span-full text-center py-12 text-slate-400">데이터를 불러오는 중입니다...</div>
         </div>
 
-        <!-- 검색 결과 없음 -->
         <div id="noResult" class="hidden text-center py-12 text-slate-500">
             <p class="text-lg">검색 결과가 없습니다.</p>
             <p class="text-sm text-slate-400 mt-1">다른 키워드로 검색해보세요.</p>
         </div>
-
     </main>
 
-    <!-- 푸터 -->
+    <!-- 관리자 로그인 및 토큰 설정 모달 -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
+                <span class="text-xs text-slate-400">Ver 20260927-3</span>
+            </div>
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">관리자 비밀번호</label>
+                    <input type="password" id="adminPasswordInput" placeholder="비밀번호 입력 (기본: 1234)" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">GitHub Personal Access Token</label>
+                    <input type="password" id="githubTokenInput" placeholder="ghp_... (최초 1회만 입력)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                    <p class="text-[11px] text-slate-400 mt-1">* 토큰은 브라우저에 안전하게 저장됩니다.</p>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAuthModal()" class="px-4 py-2 text-slate-500 font-medium text-sm hover:bg-slate-100 rounded-lg transition-colors">취소</button>
+                    <button type="submit" class="px-4 py-2 bg-[#01794c] text-white font-medium text-sm rounded-lg hover:bg-[#015c3b] transition-colors">확인</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 작성 모달 -->
+    <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h2 class="text-xl font-bold text-slate-900">새 글 업로드</h2>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-3</span>
+            </div>
+            
+            <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">구분</label>
+                    <select id="postCategory" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                        <option value="newsletters">📰 주간 소식지</option>
+                        <option value="notices">📢 공지사항</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">발행일자</label>
+                    <input type="date" id="postDate" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">제목</label>
+                    <input type="text" id="postTitle" placeholder="예: 9월 4주차 주간 소식지" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">요약 내용</label>
+                    <textarea id="postSummary" rows="3" placeholder="주요 내용을 간략히 요약하세요." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">태그 (쉼표 구분)</label>
+                    <input type="text" id="postTags" placeholder="안전운행, 주간소식" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">첨부 파일 (PDF / 이미지)</label>
+                    <input type="file" id="postFile" accept="image/*,application/pdf" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-[#01794c] hover:file:bg-emerald-100">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4 border-t">
+                    <button type="button" onclick="closeUploadModal()" class="px-4 py-2 text-slate-500 font-medium text-sm hover:bg-slate-100 rounded-lg transition-colors">취소</button>
+                    <button type="submit" id="submitBtn" class="px-4 py-2 bg-[#01794c] text-white font-medium text-sm rounded-lg hover:bg-[#015c3b] transition-colors">등록하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer class="bg-slate-100 border-t border-slate-200 mt-12">
         <div class="max-w-5xl mx-auto px-4 py-6 text-center text-sm text-slate-500">
             <p>삼영·보영운수(주) | 경기도 안양시 만안구 석수동 557-7 안양석수공영차고지 시내버스동</p>
@@ -96,9 +147,13 @@
     </footer>
 
     <script>
+        const ADMIN_PASSWORD = "1234";
+        const GITHUB_OWNER = 'richardlyeo-commits';
+        const GITHUB_REPO = 'SB_NEWS_LETTER';
+
         let newslettersData = [];
         let noticesData = [];
-        let currentTab = 'newsletters'; // 'newsletters' | 'notices'
+        let currentTab = 'newsletters';
 
         window.addEventListener('DOMContentLoaded', loadData);
 
@@ -120,7 +175,6 @@
                 if (!Array.isArray(newslettersData)) newslettersData = [];
                 if (!Array.isArray(noticesData)) noticesData = [];
 
-                // 날짜 기준 정렬
                 newslettersData.sort((a, b) => new Date(b.date) - new Date(a.date));
                 noticesData.sort((a, b) => {
                     if (!a.date && !b.date) return 0;
@@ -130,7 +184,7 @@
                 });
 
                 document.getElementById('searchInput').addEventListener('input', handleSearch);
-                switchTab('newsletters');
+                switchTab(currentTab);
 
             } catch (error) {
                 console.error(error);
@@ -138,7 +192,6 @@
                     <div class="col-span-full bg-red-50 border border-red-100 p-6 rounded-2xl text-center">
                         <p class="text-red-600 font-bold mb-1">⚠️ 데이터 불러오기 실패</p>
                         <p class="text-red-500 text-sm">${error.message}</p>
-                        <p class="text-slate-400 text-xs mt-2">newsletters.json / notices.json 파일이 있는지 확인해주세요.</p>
                     </div>
                 `;
             }
@@ -146,8 +199,6 @@
 
         function switchTab(tab) {
             currentTab = tab;
-
-            // 탭 UI 업데이트
             const newsTab = document.getElementById('tab-newsletters');
             const noticeTab = document.getElementById('tab-notices');
 
@@ -159,10 +210,7 @@
                 noticeTab.className = 'tab-active flex-1 md:flex-none px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors';
             }
 
-            // 검색창 초기화
             document.getElementById('searchInput').value = '';
-
-            // 데이터 렌더링
             renderList(getCurrentData());
         }
 
@@ -185,7 +233,6 @@
 
             noResult.classList.add('hidden');
 
-            // NEW 기준: 주간 소식지에서만 최신 2개
             const newIds = currentTab === 'newsletters' 
                 ? new Set(newslettersData.slice(0, 2).map(item => item.date))
                 : new Set();
@@ -243,10 +290,7 @@
             const keyword = e.target.value.trim().toLowerCase();
             const data = getCurrentData();
 
-            if (!keyword) {
-                renderList(data);
-                return;
-            }
+            if (!keyword) { renderList(data); return; }
 
             const filtered = data.filter(item => {
                 const title = (item.title || '').toLowerCase();
@@ -257,6 +301,153 @@
             });
 
             renderList(filtered);
+        }
+
+        function openAuthModal() {
+            document.getElementById('authModal').classList.remove('hidden');
+            document.getElementById('authModal').classList.add('flex');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('githubTokenInput').value = localStorage.getItem('sb_gh_token') || '';
+            document.getElementById('adminPasswordInput').focus();
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('authModal').classList.remove('flex');
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPasswordInput').value;
+            const token = document.getElementById('githubTokenInput').value.trim();
+
+            if (password !== ADMIN_PASSWORD) {
+                alert("비밀번호가 올바르지 않습니다.");
+                return;
+            }
+
+            if (token) {
+                localStorage.setItem('sb_gh_token', token);
+            }
+
+            closeAuthModal();
+            openUploadModal();
+        }
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+            document.getElementById('uploadModal').classList.add('flex');
+            document.getElementById('postDate').value = new Date().toISOString().substring(0, 10);
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.getElementById('uploadModal').classList.remove('flex');
+            document.getElementById('uploadForm').reset();
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const token = localStorage.getItem('sb_gh_token');
+            if (!token) {
+                alert("GitHub 토큰이 설정되지 않았습니다. 관리자 인증 시 토큰을 입력해 주세요.");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const category = document.getElementById('postCategory').value;
+            const date = document.getElementById('postDate').value;
+            const title = document.getElementById('postTitle').value;
+            const summary = document.getElementById('postSummary').value;
+            const tagsInput = document.getElementById('postTags').value;
+            const fileInput = document.getElementById('postFile');
+
+            if (fileInput.files.length === 0) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "업로드 중...";
+
+            try {
+                const file = fileInput.files[0];
+                const filePath = `files/${Date.now()}_${file.name}`;
+                
+                const base64Content = await readFileAsBase64(file);
+                await uploadToGitHub(filePath, base64Content, `Upload file: ${file.name}`, null, token);
+
+                const targetJson = category === 'newsletters' ? 'newsletters.json' : 'notices.json';
+                let currentData = [];
+                let jsonSha = null;
+
+                try {
+                    const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${targetJson}`, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    if (jsonRes.ok) {
+                        const jsonInfo = await jsonRes.json();
+                        jsonSha = jsonInfo.sha;
+                        const decodedStr = decodeURIComponent(escape(atob(jsonInfo.content)));
+                        currentData = JSON.parse(decodedStr);
+                    }
+                } catch (err) {
+                    console.log("기존 JSON 조회 실패, 신규 추가합니다.");
+                }
+
+                const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+                const newItem = {
+                    id: Date.now().toString(),
+                    date: date,
+                    title: title,
+                    summary: summary,
+                    tags: tags,
+                    file_url: `./${filePath}`
+                };
+
+                currentData.push(newItem);
+
+                const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
+                await uploadToGitHub(targetJson, updatedJsonBase64, `Update ${targetJson} for ${title}`, jsonSha, token);
+
+                alert("성공적으로 등록되었습니다!");
+                closeUploadModal();
+                loadData();
+
+            } catch (error) {
+                console.error("업로드 실패:", error);
+                alert("업로드 실패: 토큰 권한을 확인해 주세요. (" + error.message + ")");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "등록하기";
+            }
+        }
+
+        async function uploadToGitHub(path, contentBase64, commitMessage, sha = null, token) {
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+            const body = { message: commitMessage, content: contentBase64 };
+            if (sha) body.sha = sha;
+
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || "GitHub API 오류");
+            }
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
         }
 
         function escapeHtml(text) {
