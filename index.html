@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼영보영 주간 소식지 (20260927-3)</title>
+    <title>삼영보영 주간 소식지 (20260927-4)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -21,7 +21,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-3</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20260927-4</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -29,7 +29,7 @@
                     <div class="text-sm text-green-100">
                         총 <span id="total-count" class="font-bold text-white text-lg">0</span>건
                     </div>
-                    <button onclick="openAuthModal()" class="bg-white text-[#01794c] hover:bg-green-50 font-bold px-4 py-2 rounded-lg text-sm shadow transition-colors flex items-center gap-1">
+                    <button onclick="openAuthModal('create')" class="bg-white text-[#01794c] hover:bg-green-50 font-bold px-4 py-2 rounded-lg text-sm shadow transition-colors flex items-center gap-1">
                         <span>🔒 관리자 작성</span>
                     </button>
                 </div>
@@ -74,7 +74,7 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h2 class="text-lg font-bold text-slate-900">🔒 관리자 인증</h2>
-                <span class="text-xs text-slate-400">Ver 20260927-3</span>
+                <span class="text-xs text-slate-400">Ver 20260927-4</span>
             </div>
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div>
@@ -94,15 +94,16 @@
         </div>
     </div>
 
-    <!-- 작성 모달 -->
+    <!-- 작성 / 수정 모달 -->
     <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
-                <h2 class="text-xl font-bold text-slate-900">새 글 업로드</h2>
-                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-3</span>
+                <h2 id="modalTitle" class="text-xl font-bold text-slate-900">새 글 업로드</h2>
+                <span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">Ver 20260927-4</span>
             </div>
             
             <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <input type="hidden" id="editItemId">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">구분</label>
                     <select id="postCategory" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#01794c] outline-none">
@@ -128,12 +129,13 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">첨부 파일 (PDF / 이미지)</label>
-                    <input type="file" id="postFile" accept="image/*,application/pdf" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-[#01794c] hover:file:bg-emerald-100">
+                    <input type="file" id="postFile" accept="image/*,application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-[#01794c] hover:file:bg-emerald-100">
+                    <p id="fileChangeNotice" class="text-xs text-slate-400 mt-1 hidden">* 수정 시 파일 선택을 하지 않으면 기존 파일이 유지됩니다.</p>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4 border-t">
                     <button type="button" onclick="closeUploadModal()" class="px-4 py-2 text-slate-500 font-medium text-sm hover:bg-slate-100 rounded-lg transition-colors">취소</button>
-                    <button type="submit" id="submitBtn" class="px-4 py-2 bg-[#01794c] text-white font-medium text-sm rounded-lg hover:bg-[#015c3b] transition-colors">등록하기</button>
+                    <button type="submit" id="submitBtn" class="px-4 py-2 bg-[#01794c] text-white font-medium text-sm rounded-lg hover:bg-[#015c3b] transition-colors">저장하기</button>
                 </div>
             </form>
         </div>
@@ -154,6 +156,8 @@
         let newslettersData = [];
         let noticesData = [];
         let currentTab = 'newsletters';
+        let pendingAction = null; // 'create' | 'edit' | 'delete'
+        let targetEditItem = null;
 
         window.addEventListener('DOMContentLoaded', loadData);
 
@@ -249,7 +253,11 @@
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-semibold">
                                     ${formattedDate}
                                 </span>
-                                ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold">NEW</span>' : ''}
+                                <div class="flex items-center gap-1">
+                                    ${isNew ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold mr-1">NEW</span>' : ''}
+                                    <button onclick="triggerEdit('${item.id}')" class="text-slate-400 hover:text-[#01794c] p-1 text-xs font-medium" title="수정">✏️</button>
+                                    <button onclick="triggerDelete('${item.id}')" class="text-slate-400 hover:text-red-500 p-1 text-xs font-medium" title="삭제">🗑️</button>
+                                </div>
                             </div>
                             <h2 class="font-bold text-slate-900 text-lg mb-2 leading-tight">${escapeHtml(item.title)}</h2>
                             <p class="text-slate-600 text-sm leading-relaxed mb-4">${escapeHtml(item.summary || '')}</p>
@@ -303,7 +311,9 @@
             renderList(filtered);
         }
 
-        function openAuthModal() {
+        function openAuthModal(action, item = null) {
+            pendingAction = action;
+            targetEditItem = item;
             document.getElementById('authModal').classList.remove('hidden');
             document.getElementById('authModal').classList.add('flex');
             document.getElementById('adminPasswordInput').value = '';
@@ -331,19 +341,80 @@
             }
 
             closeAuthModal();
-            openUploadModal();
+
+            if (pendingAction === 'create') {
+                openUploadModal(false);
+            } else if (pendingAction === 'edit' && targetEditItem) {
+                openUploadModal(true, targetEditItem);
+            } else if (pendingAction === 'delete' && targetEditItem) {
+                executeDelete(targetEditItem);
+            }
         }
 
-        function openUploadModal() {
+        function triggerEdit(id) {
+            const data = getCurrentData();
+            const item = data.find(i => i.id === id);
+            if (!item) return;
+
+            const token = localStorage.getItem('sb_gh_token');
+            if (token) {
+                openUploadModal(true, item);
+            } else {
+                openAuthModal('edit', item);
+            }
+        }
+
+        function triggerDelete(id) {
+            const data = getCurrentData();
+            const item = data.find(i => i.id === id);
+            if (!item) return;
+
+            if (!confirm(`'${item.title}' 항목을 gerçekten 삭제하시겠습니까?`)) return;
+
+            const token = localStorage.getItem('sb_gh_token');
+            if (token) {
+                executeDelete(item);
+            } else {
+                openAuthModal('delete', item);
+            }
+        }
+
+        function openUploadModal(isEdit = false, item = null) {
+            const modalTitle = document.getElementById('modalTitle');
+            const fileNotice = document.getElementById('fileChangeNotice');
+            const fileInput = document.getElementById('postFile');
+
             document.getElementById('uploadModal').classList.remove('hidden');
             document.getElementById('uploadModal').classList.add('flex');
-            document.getElementById('postDate').value = new Date().toISOString().substring(0, 10);
+
+            if (isEdit && item) {
+                modalTitle.innerText = "소식지/공지 수정";
+                document.getElementById('editItemId').value = item.id;
+                document.getElementById('postCategory').value = currentTab;
+                document.getElementById('postDate').value = item.date || new Date().toISOString().substring(0, 10);
+                document.getElementById('postTitle').value = item.title || '';
+                document.getElementById('postSummary').value = item.summary || '';
+                document.getElementById('postTags').value = Array.isArray(item.tags) ? item.tags.join(', ') : '';
+                fileInput.required = false;
+                fileNotice.classList.remove('hidden');
+                targetEditItem = item;
+            } else {
+                modalTitle.innerText = "새 글 업로드";
+                document.getElementById('editItemId').value = '';
+                document.getElementById('uploadForm').reset();
+                document.getElementById('postCategory').value = currentTab;
+                document.getElementById('postDate').value = new Date().toISOString().substring(0, 10);
+                fileInput.required = true;
+                fileNotice.classList.add('hidden');
+                targetEditItem = null;
+            }
         }
 
         function closeUploadModal() {
             document.getElementById('uploadModal').classList.add('hidden');
             document.getElementById('uploadModal').classList.remove('flex');
             document.getElementById('uploadForm').reset();
+            targetEditItem = null;
         }
 
         async function handleFormSubmit(e) {
@@ -356,6 +427,7 @@
             }
 
             const submitBtn = document.getElementById('submitBtn');
+            const editId = document.getElementById('editItemId').value;
             const category = document.getElementById('postCategory').value;
             const date = document.getElementById('postDate').value;
             const title = document.getElementById('postTitle').value;
@@ -363,18 +435,22 @@
             const tagsInput = document.getElementById('postTags').value;
             const fileInput = document.getElementById('postFile');
 
-            if (fileInput.files.length === 0) return;
-
             submitBtn.disabled = true;
-            submitBtn.innerText = "업로드 중...";
+            submitBtn.innerText = "저장 중...";
 
             try {
-                const file = fileInput.files[0];
-                const filePath = `files/${Date.now()}_${file.name}`;
-                
-                const base64Content = await readFileAsBase64(file);
-                await uploadToGitHub(filePath, base64Content, `Upload file: ${file.name}`, null, token);
+                let filePath = targetEditItem ? targetEditItem.file_url : '';
 
+                // 1. 새 파일 첨부 시 파일 업로드
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const rawFilePath = `files/${Date.now()}_${file.name}`;
+                    const base64Content = await readFileAsBase64(file);
+                    await uploadToGitHub(rawFilePath, base64Content, `Upload file: ${file.name}`, null, token);
+                    filePath = `./${rawFilePath}`;
+                }
+
+                // 2. Target JSON 파일 정보 조회
                 const targetJson = category === 'newsletters' ? 'newsletters.json' : 'notices.json';
                 let currentData = [];
                 let jsonSha = null;
@@ -394,30 +470,80 @@
                 }
 
                 const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
-                const newItem = {
-                    id: Date.now().toString(),
-                    date: date,
-                    title: title,
-                    summary: summary,
-                    tags: tags,
-                    file_url: `./${filePath}`
-                };
 
-                currentData.push(newItem);
+                if (editId) {
+                    // 수정 모드
+                    const idx = currentData.findIndex(i => i.id === editId);
+                    if (idx !== -1) {
+                        currentData[idx] = {
+                            ...currentData[idx],
+                            date: date,
+                            title: title,
+                            summary: summary,
+                            tags: tags,
+                            file_url: filePath
+                        };
+                    }
+                } else {
+                    // 등록 모드
+                    const newItem = {
+                        id: Date.now().toString(),
+                        date: date,
+                        title: title,
+                        summary: summary,
+                        tags: tags,
+                        file_url: filePath
+                    };
+                    currentData.push(newItem);
+                }
 
+                // 3. JSON 파일 GitHub 업데이트
                 const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
                 await uploadToGitHub(targetJson, updatedJsonBase64, `Update ${targetJson} for ${title}`, jsonSha, token);
 
-                alert("성공적으로 등록되었습니다!");
+                alert(editId ? "수정되었습니다!" : "성공적으로 등록되었습니다!");
                 closeUploadModal();
                 loadData();
 
             } catch (error) {
-                console.error("업로드 실패:", error);
-                alert("업로드 실패: 토큰 권한을 확인해 주세요. (" + error.message + ")");
+                console.error("저장 실패:", error);
+                alert("저장 실패: 토큰 권한을 확인해 주세요. (" + error.message + ")");
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = "등록하기";
+                submitBtn.innerText = "저장하기";
+            }
+        }
+
+        async function executeDelete(item) {
+            const token = localStorage.getItem('sb_gh_token');
+            if (!token) {
+                alert("GitHub 토큰이 올바르지 않습니다.");
+                return;
+            }
+
+            try {
+                const targetJson = currentTab === 'newsletters' ? 'newsletters.json' : 'notices.json';
+                const jsonRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${targetJson}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+
+                if (!jsonRes.ok) throw new Error("JSON 파일을 읽어올 수 없습니다.");
+
+                const jsonInfo = await jsonRes.json();
+                const jsonSha = jsonInfo.sha;
+                const decodedStr = decodeURIComponent(escape(atob(jsonInfo.content)));
+                let currentData = JSON.parse(decodedStr);
+
+                currentData = currentData.filter(i => i.id !== item.id);
+
+                const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
+                await uploadToGitHub(targetJson, updatedJsonBase64, `Delete item: ${item.title}`, jsonSha, token);
+
+                alert("삭제되었습니다!");
+                loadData();
+            } catch (error) {
+                console.error("삭제 실패:", error);
+                alert("삭제 중 오류가 발생했습니다: " + error.message);
             }
         }
 
