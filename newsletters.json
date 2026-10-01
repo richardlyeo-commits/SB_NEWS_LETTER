@@ -8,7 +8,12 @@
     ],
     "file_url": "소식지/소식지_20260831.pdf",
     "pages": 2,
-    "id": "news_0"
+    "id": "news_0",
+    "thumbnail": "thumbs/news_0.jpg",
+    "pages_images": [
+      "20260831_1.jpg",
+      "20260831_2.jpg"
+    ]
   },
   {
     "date": "2026-08-24",
@@ -19,7 +24,12 @@
     ],
     "file_url": "소식지/소식지_20260824.pdf",
     "pages": 2,
-    "id": "news_1"
+    "id": "news_1",
+    "thumbnail": "thumbs/news_1.jpg",
+    "pages_images": [
+      "20260824_1.jpg",
+      "20260824_2.jpg"
+    ]
   },
   {
     "date": "2026-08-17",
@@ -28,7 +38,12 @@
     "tags": [],
     "file_url": "소식지/소식지 0817.pdf",
     "pages": 2,
-    "id": "news_2"
+    "id": "news_2",
+    "thumbnail": "thumbs/news_2.jpg",
+    "pages_images": [
+      "20260817_1.jpg",
+      "20260817_2.jpg"
+    ]
   },
   {
     "date": "2026-08-10",
@@ -39,7 +54,12 @@
     ],
     "file_url": "소식지/소식지 스캔파일_20260810.pdf",
     "pages": 2,
-    "id": "news_3"
+    "id": "news_3",
+    "thumbnail": "thumbs/news_3.jpg",
+    "pages_images": [
+      "20260810_1.jpg",
+      "20260810_2.jpg"
+    ]
   },
   {
     "date": "2026-08-03",
@@ -50,7 +70,12 @@
     ],
     "file_url": "소식지/20260803-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_4"
+    "id": "news_4",
+    "thumbnail": "thumbs/news_4.jpg",
+    "pages_images": [
+      "20260803_1.jpg",
+      "20260803_2.jpg"
+    ]
   },
   {
     "date": "2026-07-27",
@@ -61,7 +86,12 @@
     ],
     "file_url": "소식지/20260727-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_5"
+    "id": "news_5",
+    "thumbnail": "thumbs/news_5.jpg",
+    "pages_images": [
+      "20260727_1.jpg",
+      "20260727_2.jpg"
+    ]
   },
   {
     "date": "2026-07-20",
@@ -72,7 +102,12 @@
     ],
     "file_url": "소식지/소식지_20260720_스캔파일.pdf",
     "pages": 2,
-    "id": "news_6"
+    "id": "news_6",
+    "thumbnail": "thumbs/news_6.jpg",
+    "pages_images": [
+      "20260720_1.jpg",
+      "20260720_2.jpg"
+    ]
   },
   {
     "date": "2026-07-13",
@@ -83,7 +118,12 @@
     ],
     "file_url": "소식지/소식지 스캔파일_20260713.pdf",
     "pages": 2,
-    "id": "news_7"
+    "id": "news_7",
+    "thumbnail": "thumbs/news_7.jpg",
+    "pages_images": [
+      "20260713_1.jpg",
+      "20260713_2.jpg"
+    ]
   },
   {
     "date": "2026-07-06",
@@ -94,7 +134,12 @@
     ],
     "file_url": "소식지/소식지 날인파일_20260706.pdf",
     "pages": 2,
-    "id": "news_8"
+    "id": "news_8",
+    "thumbnail": "thumbs/news_8.jpg",
+    "pages_images": [
+      "20260706_1.jpg",
+      "20260706_2.jpg"
+    ]
   },
   {
     "date": "2026-06-29",
@@ -105,7 +150,12 @@
     ],
     "file_url": "소식지/소식지 20260629.pdf",
     "pages": 2,
-    "id": "news_9"
+    "id": "news_9",
+    "thumbnail": "thumbs/news_9.jpg",
+    "pages_images": [
+      "20260629_1.jpg",
+      "20260629_2.jpg"
+    ]
   },
   {
     "date": "2026-06-15",
@@ -116,7 +166,12 @@
     ],
     "file_url": "소식지/20260615-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_10"
+    "id": "news_10",
+    "thumbnail": "thumbs/news_10.jpg",
+    "pages_images": [
+      "20260615_1.jpg",
+      "20260615_2.jpg"
+    ]
   },
   {
     "date": "2026-06-08",
@@ -127,7 +182,12 @@
     ],
     "file_url": "소식지/6월8일자 소식지.pdf",
     "pages": 2,
-    "id": "news_11"
+    "id": "news_11",
+    "thumbnail": "thumbs/news_11.jpg",
+    "pages_images": [
+      "20260608_1.jpg",
+      "20260608_2.jpg"
+    ]
   },
   {
     "date": "2026-06-01",
@@ -138,7 +198,12 @@
     ],
     "file_url": "소식지/6월1일자 소식지 스캔파일.pdf",
     "pages": 2,
-    "id": "news_12"
+    "id": "news_12",
+    "thumbnail": "thumbs/news_12.jpg",
+    "pages_images": [
+      "pages/news_12_1.jpg",
+      "pages/news_12_2.jpg"
+    ]
   },
   {
     "date": "2026-05-25",
@@ -149,7 +214,12 @@
     ],
     "file_url": "소식지/소식지 스캔파일_20260525.pdf",
     "pages": 2,
-    "id": "news_13"
+    "id": "news_13",
+    "thumbnail": "thumbs/news_13.jpg",
+    "pages_images": [
+      "20260525_1.jpg",
+      "20260525_2.jpg"
+    ]
   },
   {
     "date": "2026-05-11",
@@ -160,7 +230,12 @@
     ],
     "file_url": "소식지/소식지 스캔파일_20260511.pdf",
     "pages": 2,
-    "id": "news_14"
+    "id": "news_14",
+    "thumbnail": "thumbs/news_14.jpg",
+    "pages_images": [
+      "20260511_1.png",
+      "20260511_2.png"
+    ]
   },
   {
     "date": "2026-05-04",
@@ -171,7 +246,12 @@
     ],
     "file_url": "소식지/20260504_소식지 스캔파일.pdf",
     "pages": 2,
-    "id": "news_15"
+    "id": "news_15",
+    "thumbnail": "thumbs/news_15.jpg",
+    "pages_images": [
+      "20260504_1.jpg",
+      "20260504_2.jpg"
+    ]
   },
   {
     "date": "2026-04-20",
@@ -182,7 +262,12 @@
     ],
     "file_url": "소식지/4월 20일자 날인 파일.pdf",
     "pages": 2,
-    "id": "news_16"
+    "id": "news_16",
+    "thumbnail": "thumbs/news_16.jpg",
+    "pages_images": [
+      "20260420_1.jpg",
+      "20260420_2.jpg"
+    ]
   },
   {
     "date": "2026-04-13",
@@ -193,7 +278,12 @@
     ],
     "file_url": "소식지/소식지 날인 파일_20260413.pdf",
     "pages": 2,
-    "id": "news_17"
+    "id": "news_17",
+    "thumbnail": "thumbs/news_17.jpg",
+    "pages_images": [
+      "20260413_1.jpg",
+      "20260413_2.jpg"
+    ]
   },
   {
     "date": "2026-04-06",
@@ -204,7 +294,12 @@
     ],
     "file_url": "소식지/소식지 20260406-최종.pdf",
     "pages": 2,
-    "id": "news_18"
+    "id": "news_18",
+    "thumbnail": "thumbs/news_18.jpg",
+    "pages_images": [
+      "20260406_1.jpg",
+      "20260406_2.jpg"
+    ]
   },
   {
     "date": "2026-03-30",
@@ -215,7 +310,12 @@
     ],
     "file_url": "소식지/20260330-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_19"
+    "id": "news_19",
+    "thumbnail": "thumbs/news_19.jpg",
+    "pages_images": [
+      "20260330_1.jpg",
+      "20260330_2.jpg"
+    ]
   },
   {
     "date": "2026-03-23",
@@ -226,7 +326,12 @@
     ],
     "file_url": "소식지/소식지 20260323.pdf",
     "pages": 2,
-    "id": "news_20"
+    "id": "news_20",
+    "thumbnail": "thumbs/news_20.jpg",
+    "pages_images": [
+      "20260323_1.jpg",
+      "20260323_2.jpg"
+    ]
   },
   {
     "date": "2026-03-16",
@@ -237,7 +342,12 @@
     ],
     "file_url": "소식지/20260316-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_21"
+    "id": "news_21",
+    "thumbnail": "thumbs/news_21.jpg",
+    "pages_images": [
+      "20260316_1.jpg",
+      "20260316_2.jpg"
+    ]
   },
   {
     "date": "2026-03-09",
@@ -248,7 +358,12 @@
     ],
     "file_url": "소식지/20260309-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_22"
+    "id": "news_22",
+    "thumbnail": "thumbs/news_22.jpg",
+    "pages_images": [
+      "20260309_1.jpg",
+      "20260309_2.jpg"
+    ]
   },
   {
     "date": "2026-03-03",
@@ -259,7 +374,12 @@
     ],
     "file_url": "소식지/20260303-소식지-최종.pdf",
     "pages": 2,
-    "id": "news_23"
+    "id": "news_23",
+    "thumbnail": "thumbs/news_23.jpg",
+    "pages_images": [
+      "20260303_1.jpg",
+      "20260303_2.jpg"
+    ]
   },
   {
     "date": "2026-02-16",
@@ -270,7 +390,12 @@
     ],
     "file_url": "소식지/20260216_소식지.pdf",
     "pages": 2,
-    "id": "news_24"
+    "id": "news_24",
+    "thumbnail": "thumbs/news_24.jpg",
+    "pages_images": [
+      "20260216_1.jpg",
+      "20260216_2.jpg"
+    ]
   },
   {
     "date": "2026-02-02",
@@ -281,7 +406,12 @@
     ],
     "file_url": "소식지/20260202_소식지.pdf",
     "pages": 2,
-    "id": "news_25"
+    "id": "news_25",
+    "thumbnail": "thumbs/news_25.jpg",
+    "pages_images": [
+      "20260202_1.jpg",
+      "20260202_2.jpg"
+    ]
   },
   {
     "date": "2026-01-26",
@@ -292,7 +422,12 @@
     ],
     "file_url": "소식지/20260126_소식지.pdf",
     "pages": 2,
-    "id": "news_26"
+    "id": "news_26",
+    "thumbnail": "thumbs/news_26.jpg",
+    "pages_images": [
+      "20260126_1.jpg",
+      "20260126_2.jpg"
+    ]
   },
   {
     "date": "2026-01-19",
@@ -303,7 +438,12 @@
     ],
     "file_url": "소식지/20260119_소식지.pdf",
     "pages": 2,
-    "id": "news_27"
+    "id": "news_27",
+    "thumbnail": "thumbs/news_27.jpg",
+    "pages_images": [
+      "20260119_1.jpg",
+      "20260119_2.jpg"
+    ]
   },
   {
     "date": "2026-01-12",
@@ -314,7 +454,12 @@
     ],
     "file_url": "소식지/20260112_소식지.pdf",
     "pages": 2,
-    "id": "news_28"
+    "id": "news_28",
+    "thumbnail": "thumbs/news_28.jpg",
+    "pages_images": [
+      "20260112_1.jpg",
+      "20260112_2.jpg"
+    ]
   },
   {
     "date": "2026-01-05",
@@ -325,23 +470,38 @@
     ],
     "file_url": "소식지/20260105_소식지.pdf",
     "pages": 2,
-    "id": "news_29"
+    "id": "news_29",
+    "thumbnail": "thumbs/news_29.jpg",
+    "pages_images": [
+      "20260105_1.jpg",
+      "20260105_2.jpg"
+    ]
   },
   {
     "id": "1790480079807",
-    "date": "2026-09-27",
+    "date": "2026-09-23",
     "title": "26년09월23일 소식지",
     "summary": "정류장 진입 전 승객 하차 금지",
     "tags": [],
-    "file_url": "./files/1790480075656_20260923_정류장 진입전 하차 금지.pdf"
+    "file_url": "./files/1790480075656_20260923_정류장 진입전 하차 금지.pdf",
+    "thumbnail": "thumbs/1790480079807.jpg",
+    "pages_images": [
+      "pages/1790480079807_1.jpg",
+      "pages/1790480079807_2.jpg"
+    ]
   },
   {
     "id": "1790481197608",
-    "date": "2026-09-27",
-    "title": "26년09년21일 소식지",
+    "date": "2026-09-21",
+    "title": "26년09월21일 소식지",
     "summary": "세차 • 검차 시 임의단측 운행 금지",
     "tags": [],
-    "file_url": "./files/1790481194211_260921_소식지.pdf"
+    "file_url": "./files/1790481194211_260921_소식지.pdf",
+    "thumbnail": "thumbs/1790481197608.jpg",
+    "pages_images": [
+      "pages/1790481197608_1.jpg",
+      "pages/1790481197608_2.jpg"
+    ]
   },
   {
     "id": "1790481601201",
@@ -349,7 +509,12 @@
     "title": "26년09월07일 소식지",
     "summary": "운전석 주변에 시트지 부착(->안양시 적발) 금지",
     "tags": [],
-    "file_url": "./files/1790481598082_소식지_20260907.pdf"
+    "file_url": "./files/1790481598082_소식지_20260907.pdf",
+    "thumbnail": "thumbs/1790481601201.jpg",
+    "pages_images": [
+      "20260907_1.jpg",
+      "20260907_2.jpg"
+    ]
   },
   {
     "id": "1790482343972",
@@ -357,6 +522,10 @@
     "title": "26년09월14일 소식지",
     "summary": "26년 법정 교육",
     "tags": [],
-    "file_url": "./files/1790482341073_소식지260914.png"
+    "file_url": "./files/1790482341073_소식지260914.png",
+    "thumbnail": "thumbs/1790482343972.jpg",
+    "pages_images": [
+      "./files/1790482341073_소식지260914.png"
+    ]
   }
 ]

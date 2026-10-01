@@ -7,7 +7,12 @@
       "공지문"
     ],
     "file_url": "소식지/12대 중과실 금지 안내문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9000",
+    "thumbnail": "thumbs/notice_auto_9000.jpg",
+    "pages_images": [
+      "pages/notice_auto_9000_1.jpg"
+    ]
   },
   {
     "date": "",
@@ -17,7 +22,12 @@
       "공지문"
     ],
     "file_url": "소식지/P9901_예약제 안내문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9001",
+    "thumbnail": "thumbs/notice_auto_9001.jpg",
+    "pages_images": [
+      "pages/notice_auto_9001_1.jpg"
+    ]
   },
   {
     "date": "2026-07-28",
@@ -27,7 +37,12 @@
       "공지문"
     ],
     "file_url": "소식지/20260728_종점 전 하차요구금지 공지문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9002",
+    "thumbnail": "thumbs/notice_auto_9002.jpg",
+    "pages_images": [
+      "pages/notice_auto_9002_1.jpg"
+    ]
   },
   {
     "date": "2026-07-14",
@@ -37,7 +52,12 @@
       "공지문"
     ],
     "file_url": "소식지/260714_휠체어장애인 승차거부금지 공지문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9003",
+    "thumbnail": "thumbs/notice_auto_9003.jpg",
+    "pages_images": [
+      "pages/notice_auto_9003_1.jpg"
+    ]
   },
   {
     "date": "2026-07-01",
@@ -47,7 +67,12 @@
       "공지문"
     ],
     "file_url": "소식지/202607_정류장 질서문란 금지 공지문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9004",
+    "thumbnail": "thumbs/notice_auto_9004.jpg",
+    "pages_images": [
+      "pages/notice_auto_9004_1.jpg"
+    ]
   },
   {
     "date": "2026-07-01",
@@ -57,7 +82,12 @@
       "공지문"
     ],
     "file_url": "소식지/202607_조조할인 관련 공지문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9005",
+    "thumbnail": "thumbs/notice_auto_9005.jpg",
+    "pages_images": [
+      "pages/notice_auto_9005_1.jpg"
+    ]
   },
   {
     "date": "2026-01-01",
@@ -67,7 +97,12 @@
       "공지문"
     ],
     "file_url": "소식지/202601_혹한기 난방가동관련 공지문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9006",
+    "thumbnail": "thumbs/notice_auto_9006.jpg",
+    "pages_images": [
+      "pages/notice_auto_9006_1.jpg"
+    ]
   },
   {
     "date": "2025-12-31",
@@ -77,7 +112,12 @@
       "공지문"
     ],
     "file_url": "소식지/20251231_승무 전 음주 측정 준수 및 복무 기강 확립 안내문.pdf",
-    "pages": 1
+    "pages": 1,
+    "id": "notice_auto_9007",
+    "thumbnail": "thumbs/notice_auto_9007.jpg",
+    "pages_images": [
+      "pages/notice_auto_9007_1.jpg"
+    ]
   },
   {
     "id": "1790481945750",
@@ -85,6 +125,10 @@
     "title": "지정된 근무복 착용합시다",
     "summary": "지정된 근무복 착용",
     "tags": [],
-    "file_url": "./files/1790481943383_(26.09.02) 승무원 복장.pdf"
+    "file_url": "./files/1790481943383_(26.09.02) 승무원 복장.pdf",
+    "thumbnail": "thumbs/1790481945750.jpg",
+    "pages_images": [
+      "pages/1790481945750_1.jpg"
+    ]
   }
 ]

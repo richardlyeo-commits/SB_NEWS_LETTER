@@ -1,14 +1,31 @@
-const ADMIN_PASSWORD = "6666";
-const GITHUB_OWNER = 'richardlyeo-commits';
+// ============================================================
+// admin.js
+// 관리자가 로그인해서 글을 올리고(작성) / 고치고(수정) / 지우는(삭제) 기능을 담당합니다.
+// 파일을 PDF나 사진으로 선택하면, 자동으로 "작은 미리보기 사진(썸네일)"과
+// "화면에서 크게 볼 수 있는 사진들"을 만들어서 GitHub 저장소에 올려줍니다.
+// (PDF 파일을 그대로 올리지 않기 때문에, 보는 사람은 PDF 프로그램 없이도
+//  소식지를 바로 화면에서 볼 수 있습니다.)
+// ============================================================
 
-let pendingAction = null; 
+const ADMIN_PASSWORD = "6666";           // 관리자 비밀번호
+const GITHUB_OWNER = 'richardlyeo-commits'; // GitHub 저장소 소유자 이름
+
+let pendingAction = null;
 let targetEditItem = null;
 
+// 이번에 선택한 파일로 새로 만든 썸네일/페이지 이미지를 잠깐 담아두는 곳
+// (저장 버튼을 눌러야 실제로 GitHub에 업로드됩니다)
+let generatedThumbDataUrl = null;   // 작은 미리보기 이미지 1장 (data:image/jpeg;base64,...)
+let generatedPageDataUrls = [];     // 크게 볼 때 쓰는 이미지들(PDF면 여러 장일 수 있음)
+
+// 날짜(YYYY년도 기준)에 따라 어느 저장소(SB_NEWS_LETTER / SB_NEWS_2027)에 저장할지 정합니다.
 function getRepoByDate(dateStr) {
     if (!dateStr) return 'SB_NEWS_LETTER';
     const year = parseInt(dateStr.substring(0, 4), 10);
     return year >= 2027 ? 'SB_NEWS_2027' : 'SB_NEWS_LETTER';
 }
+
+// ---------------- 로그인(인증) 모달 ----------------
 
 function openAuthModal(action, item = null) {
     pendingAction = action;
@@ -39,7 +56,6 @@ function handleAuthSubmit(e) {
         localStorage.setItem('sb_gh_token', token);
     }
 
-    // 🌟 로그인 성공 시 관리자 모드를 켜고 화면을 다시 그려 버튼(✏️, 🗑️) 표시
     isAdminMode = true;
     renderList(getCurrentData());
     closeAuthModal();
@@ -60,9 +76,8 @@ function handleEditClick(id) {
         alert("선택한 항목의 정보를 찾을 수 없습니다.");
         return;
     }
-
     targetEditItem = item;
-    openUploadModal(true, item); // 버튼이 보인다는 건 이미 인증되었다는 뜻이므로 바로 염
+    openUploadModal(true, item);
 }
 
 function handleDeleteClick(id) {
@@ -76,12 +91,15 @@ function handleDeleteClick(id) {
     }
 }
 
+// ---------------- 작성/수정 모달 ----------------
+
 function openUploadModal(isEdit = false, item = null) {
     const modalTitle = document.getElementById('modalTitle');
     const fileNotice = document.getElementById('fileChangeNotice');
     const fileInput = document.getElementById('postFile');
 
     document.getElementById('uploadForm').reset();
+    resetThumbPreview();
     targetEditItem = item;
 
     document.getElementById('uploadModal').classList.remove('hidden');
@@ -111,8 +129,153 @@ function closeUploadModal() {
     document.getElementById('uploadModal').classList.add('hidden');
     document.getElementById('uploadModal').classList.remove('flex');
     document.getElementById('uploadForm').reset();
+    resetThumbPreview();
     targetEditItem = null;
 }
+
+function resetThumbPreview() {
+    generatedThumbDataUrl = null;
+    generatedPageDataUrls = [];
+    document.getElementById('thumbPreviewWrap').classList.add('hidden');
+}
+
+// ---------------- ① 파일을 고르면 자동으로 썸네일 + 날짜/제목 추정 ----------------
+
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('postFile');
+    if (fileInput) fileInput.addEventListener('change', handleFileSelected);
+});
+
+async function handleFileSelected(e) {
+    const file = e.target.files[0];
+    resetThumbPreview();
+    if (!file) return;
+
+    const wrap = document.getElementById('thumbPreviewWrap');
+    const statusEl = document.getElementById('thumbPreviewStatus');
+    const previewImg = document.getElementById('thumbPreviewImg');
+    wrap.classList.remove('hidden');
+    statusEl.innerText = '썸네일을 만드는 중입니다...';
+    previewImg.src = '';
+
+    // 파일 이름으로 날짜/제목을 추측해서 자동으로 입력해둡니다. (틀리면 고치면 됩니다)
+    autoFillDateAndTitle(file.name);
+
+    try {
+        if (file.type === 'application/pdf') {
+            // PDF -> 각 쪽을 이미지로 변환
+            const { thumbDataUrl, pageDataUrls } = await renderPdfToImages(file);
+            generatedThumbDataUrl = thumbDataUrl;
+            generatedPageDataUrls = pageDataUrls;
+        } else {
+            // 사진(JPG/PNG 등) -> 크기만 줄여서 썸네일로 사용, 원본은 그대로 1쪽으로 사용
+            generatedThumbDataUrl = await resizeImageFile(file, 480, 0.78);
+            generatedPageDataUrls = [await resizeImageFile(file, 1400, 0.85)];
+        }
+        previewImg.src = generatedThumbDataUrl;
+        statusEl.innerText = `썸네일 생성 완료! (${generatedPageDataUrls.length}쪽)`;
+    } catch (err) {
+        console.error(err);
+        statusEl.innerText = '썸네일 생성에 실패했습니다. 그래도 저장은 진행할 수 있어요.';
+    }
+}
+
+// 파일명에서 날짜를 추측합니다. 예: 20260923_소식지.pdf / 260921_소식지.pdf / (26.09.02) 승무원 복장.pdf
+function autoFillDateAndTitle(filename) {
+    let y, m, d;
+
+    // 8자리(20260923) 패턴
+    let match = filename.match(/(20\d{2})[.\-_]?(\d{2})[.\-_]?(\d{2})/);
+    if (match) {
+        y = match[1]; m = match[2]; d = match[3];
+    } else {
+        // 6자리(260921) 또는 (26.09.02) 같은 2자리 연도 패턴
+        match = filename.match(/(\d{2})[.\-_]?(\d{2})[.\-_]?(\d{2})/);
+        if (match) { y = '20' + match[1]; m = match[2]; d = match[3]; }
+    }
+
+    if (y && m && d) {
+        const mm = String(Math.min(Math.max(parseInt(m, 10), 1), 12)).padStart(2, '0');
+        const dd = String(Math.min(Math.max(parseInt(d, 10), 1), 31)).padStart(2, '0');
+        const guessedDate = `${y}-${mm}-${dd}`;
+
+        const dateInput = document.getElementById('postDate');
+        dateInput.value = guessedDate;
+
+        const titleInput = document.getElementById('postTitle');
+        if (!titleInput.value) {
+            const category = document.getElementById('postCategory').value;
+            const label = category === 'notices' ? '공지' : '주간 소식지';
+            titleInput.value = `${y}년 ${parseInt(mm, 10)}월 ${parseInt(dd, 10)}일자 ${label}`;
+        }
+    }
+}
+
+// 이미지 파일을 정해진 너비로 줄여서 JPEG data URL로 돌려주는 함수
+function resizeImageFile(file, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const scale = Math.min(1, maxWidth / img.width);
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = reject;
+            img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// PDF 파일을 브라우저 안에서 페이지별 이미지로 바꿔주는 함수 (pdf.js 라이브러리 사용)
+async function renderPdfToImages(file) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    const pageDataUrls = [];
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.8 }); // 화질(선명함) 조절값
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        pageDataUrls.push(canvas.toDataURL('image/jpeg', 0.85));
+    }
+
+    // 1쪽을 작게 줄여서 썸네일로 사용
+    const thumbDataUrl = await shrinkDataUrl(pageDataUrls[0], 480, 0.78);
+    return { thumbDataUrl, pageDataUrls };
+}
+
+// 이미 만들어진 data URL 이미지를 더 작게 줄여주는 보조 함수(썸네일용)
+function shrinkDataUrl(dataUrl, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(1, maxWidth / img.width);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
+
+// ---------------- ② 저장(GitHub 업로드) ----------------
 
 async function handleFormSubmit(e) {
     e.preventDefault();
@@ -130,25 +293,34 @@ async function handleFormSubmit(e) {
     const title = document.getElementById('postTitle').value;
     const summary = document.getElementById('postSummary').value;
     const tagsInput = document.getElementById('postTags').value;
-    const fileInput = document.getElementById('postFile');
 
     const targetRepo = getRepoByDate(date);
 
     submitBtn.disabled = true;
-    submitBtn.innerText = "저장 중...";
 
     try {
-        let filePath = targetEditItem ? targetEditItem.file_url : '';
+        // 수정 시 새 파일을 올리지 않으면 기존 썸네일/이미지를 그대로 사용합니다.
+        let thumbnailPath = targetEditItem ? targetEditItem.thumbnail : '';
+        let pagesPaths = targetEditItem ? (targetEditItem.pages_images || []) : [];
 
-        if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const reverseTime = 9999999999999 - Date.now();
-            const rawFilePath = `files/${reverseTime}_${file.name}`;
-            
-            const base64Content = await readFileAsBase64(file);
-            await uploadToGitHub(targetRepo, rawFilePath, base64Content, `Upload file: ${file.name}`, null, token);
-            filePath = `./${rawFilePath}`;
+        if (generatedThumbDataUrl && generatedPageDataUrls.length > 0) {
+            const stamp = Date.now();
+
+            submitBtn.innerText = "썸네일 올리는 중...";
+            const thumbRawPath = `thumbs/${stamp}.jpg`;
+            await uploadToGitHub(targetRepo, thumbRawPath, dataUrlToBase64(generatedThumbDataUrl), `Upload thumbnail for: ${title}`, null, token);
+            thumbnailPath = `./${thumbRawPath}`;
+
+            pagesPaths = [];
+            for (let i = 0; i < generatedPageDataUrls.length; i++) {
+                submitBtn.innerText = `이미지 올리는 중... (${i + 1}/${generatedPageDataUrls.length})`;
+                const pageRawPath = `pages/${stamp}_${i + 1}.jpg`;
+                await uploadToGitHub(targetRepo, pageRawPath, dataUrlToBase64(generatedPageDataUrls[i]), `Upload page image ${i + 1} for: ${title}`, null, token);
+                pagesPaths.push(`./${pageRawPath}`);
+            }
         }
+
+        submitBtn.innerText = "목록 저장 중...";
 
         const targetJson = category === 'newsletters' ? 'newsletters.json' : 'notices.json';
         let currentData = [];
@@ -168,7 +340,6 @@ async function handleFormSubmit(e) {
             console.log("기존 JSON 조회 실패, 신규 추가합니다.");
         }
 
-        // 🌟 [핵심 수정] 깃허브에서 방금 불러온 과거 원본 데이터에도 임시 ID를 부여하여, 업데이트 대상을 찾을 수 있게 함
         currentData.forEach((item, idx) => {
             if (item.id === undefined) {
                 item.id = category === 'newsletters' ? `news_${idx}` : `notice_${idx}`;
@@ -179,31 +350,25 @@ async function handleFormSubmit(e) {
 
         const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
+        const newFields = {
+            date: date,
+            title: title,
+            summary: summary,
+            tags: tags,
+            thumbnail: thumbnailPath,
+            pages_images: pagesPaths
+        };
+
         if (editId) {
             const idx = currentData.findIndex(i => String(i.id) === String(editId));
             if (idx !== -1) {
-                currentData[idx] = {
-                    ...currentData[idx],
-                    date: date,
-                    title: title,
-                    summary: summary,
-                    tags: tags,
-                    file_url: filePath
-                };
+                currentData[idx] = { ...currentData[idx], ...newFields };
             } else {
                 alert("수정 대상을 깃허브 원본에서 찾지 못했습니다. 새로고침 후 다시 시도해주세요.");
                 throw new Error("Match Failed");
             }
         } else {
-            const newItem = {
-                id: Date.now().toString(),
-                date: date,
-                title: title,
-                summary: summary,
-                tags: tags,
-                file_url: filePath
-            };
-            currentData.push(newItem);
+            currentData.push({ id: Date.now().toString(), ...newFields });
         }
 
         const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
@@ -241,7 +406,6 @@ async function executeDelete(item) {
         const decodedStr = decodeURIComponent(escape(atob(jsonInfo.content)));
         let currentData = JSON.parse(decodedStr);
 
-        // 삭제 시에도 ID 매칭 보강
         currentData.forEach((i, idx) => {
             if (i.id === undefined) {
                 i.id = currentTab === 'newsletters' ? `news_${idx}` : `notice_${idx}`;
@@ -263,6 +427,7 @@ async function executeDelete(item) {
     }
 }
 
+// GitHub API를 통해 파일 하나를 저장소에 올리는(또는 덮어쓰는) 함수
 async function uploadToGitHub(repo, path, contentBase64, commitMessage, sha = null, token) {
     const url = `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/contents/${path}`;
     const body = { message: commitMessage, content: contentBase64 };
@@ -283,11 +448,7 @@ async function uploadToGitHub(repo, path, contentBase64, commitMessage, sha = nu
     }
 }
 
-function readFileAsBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
+// "data:image/jpeg;base64,AAAA..." 형태에서 base64 부분만 잘라내는 함수
+function dataUrlToBase64(dataUrl) {
+    return dataUrl.split(',')[1];
 }
