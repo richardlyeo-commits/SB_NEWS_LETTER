@@ -113,13 +113,7 @@ function renderList(data) {
 
     noResult.classList.add('hidden');
 
-    // 가장 최근 2건에 'NEW' 표시를 붙여줍니다.
-    const newIds = currentTab === 'newsletters'
-        ? new Set(newslettersData.slice(0, 2).map(item => item.date))
-        : new Set();
-
     listContainer.innerHTML = data.map((item, dataIdx) => {
-        const isNew = newIds.has(item.date);
         const formattedDate = formatDate(item.date);
         const images = getViewableImages(item);
         const thumbSrc = item.thumbnail || images[0] || '';
@@ -138,7 +132,6 @@ function renderList(data) {
                         ? `<img src="${thumbSrc}" alt="${escapeHtml(item.title)} 미리보기" loading="lazy" class="skeleton" onload="this.classList.remove('skeleton')">`
                         : `<div class="w-full h-full flex items-center justify-center text-slate-300 text-4xl">📄</div>`
                     }
-                    ${isNew ? '<span class="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold shadow">NEW</span>' : ''}
                     ${hasFile ? `<div class="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-center justify-center">
                         <span class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-[#01794c] text-xs font-bold px-3 py-1.5 rounded-full">🔍 크게 보기</span>
                     </div>` : ''}
