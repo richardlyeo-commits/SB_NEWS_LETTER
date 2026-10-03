@@ -1,14 +1,22 @@
 // ============================================================
-// app.js
+// app.js   (버전: 20261004-01)
 // 화면에 소식지/공지사항 목록을 불러와 카드로 보여주고,
 // 카드를 누르면 큰 이미지로 전체 내용을 볼 수 있게 해주는 파일입니다.
 // (컴퓨터를 잘 모르는 분도 이해할 수 있도록 각 부분에 설명을 달아두었습니다)
+//
+// [2026-10-04 변경] 글이 계속 쌓여도 쉽게 찾을 수 있도록
+// '연도' / '월'을 고르는 드롭다운(선택 상자)을 추가했습니다.
+// 검색창 글자 + 연도 + 월, 이 세 가지를 한꺼번에 따져서 목록을 걸러줍니다.
 // ============================================================
 
 let newslettersData = [];   // 주간 소식지 목록을 저장해 둘 배열
 let noticesData = [];       // 공지사항 목록을 저장해 둘 배열
 let currentTab = 'newsletters'; // 지금 보고 있는 탭(소식지/공지)
 let isAdminMode = false;    // 관리자 로그인 여부(기본은 꺼짐 = 일반 방문자 모드)
+
+// 연도/월 드롭다운에서 지금 선택되어 있는 값('' 이면 '전체'를 뜻함)
+let selectedYear = '';
+let selectedMonth = '';
 
 // 라이트박스(큰 화면 보기)용 상태값
 let viewerList = [];   // 현재 보고 있는 소식지의 이미지 경로들(여러 쪽일 수 있음)
@@ -50,7 +58,25 @@ async function loadData() {
             return new Date(b.date) - new Date(a.date);
         });
 
-        document.getElementById('searchInput').addEventListener('input', handleSearch);
+        // 연도/월 드롭다운에 실제 데이터에 맞는 선택지를 채워 넣습니다.
+        populateYearMonthOptions();
+
+        // 글을 저장/삭제하면 admin.js가 loadData()를 다시 부릅니다.
+        // 그때마다 이벤트를 또 연결하면 클릭/입력 한 번에 함수가 여러 번 실행되는
+        // 문제가 생기므로, 검색/드롭다운 이벤트 연결은 맨 처음 한 번만 합니다.
+        if (!window.__sbFiltersBound) {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('yearFilter').addEventListener('change', (e) => {
+                selectedYear = e.target.value;
+                applyFilters();
+            });
+            document.getElementById('monthFilter').addEventListener('change', (e) => {
+                selectedMonth = e.target.value;
+                applyFilters();
+            });
+            window.__sbFiltersBound = true;
+        }
+
         switchTab(currentTab);
 
     } catch (error) {
@@ -79,7 +105,8 @@ function switchTab(tab) {
     }
 
     document.getElementById('searchInput').value = '';
-    renderList(getCurrentData());
+    // 탭을 바꿀 때는 검색어만 지우고, 연도/월 선택은 그대로 유지합니다.
+    applyFilters();
 }
 
 // 지금 선택된 탭의 데이터 배열을 돌려줍니다.
@@ -247,13 +274,55 @@ function renderTags(tags) {
     `;
 }
 
-function handleSearch(e) {
-    const keyword = e.target.value.trim().toLowerCase();
+// 연도/월 드롭다운의 선택지를 실제 데이터(소식지+공지 전체)에 맞춰 자동으로 채워줍니다.
+// 예: 글의 날짜가 2026-03 ~ 2026-10 사이에 있으면 "2026"만 연도 목록에 나타납니다.
+function populateYearMonthOptions() {
+    const yearSelect = document.getElementById('yearFilter');
+    const monthSelect = document.getElementById('monthFilter');
+
+    // 소식지 + 공지사항을 합쳐서 날짜가 있는 것만 모읍니다.
+    const allItems = [...newslettersData, ...noticesData];
+    const yearSet = new Set();
+    allItems.forEach(item => {
+        if (item.date && item.date.length >= 7) {
+            yearSet.add(item.date.substring(0, 4)); // 'YYYY-MM-DD' 에서 앞 4자리(연도)
+        }
+    });
+
+    // 최근 연도가 위로 오도록 정렬
+    const years = Array.from(yearSet).sort((a, b) => b.localeCompare(a));
+
+    // 이전에 선택되어 있던 값은 최대한 유지합니다.
+    const prevYear = yearSelect.value;
+    yearSelect.innerHTML = '<option value="">전체 연도</option>' +
+        years.map(y => `<option value="${y}">${y}년</option>`).join('');
+    if (years.includes(prevYear)) yearSelect.value = prevYear;
+
+    // 월은 1~12월 고정 목록(실제로 글이 없는 달이어도 선택은 가능하게 둡니다)
+    const prevMonth = monthSelect.value;
+    monthSelect.innerHTML = '<option value="">전체 월</option>' +
+        Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
+            .map(m => `<option value="${m}">${parseInt(m, 10)}월</option>`).join('');
+    if (prevMonth) monthSelect.value = prevMonth;
+}
+
+// 검색어 + 연도 + 월, 이 세 가지 조건을 모두 만족하는 글만 걸러서 화면에 그려줍니다.
+// (검색창에 입력하거나, 연도/월 드롭다운을 바꾸거나, 탭을 바꿀 때마다 이 함수가 실행됩니다)
+function applyFilters() {
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
     const data = getCurrentData();
 
-    if (!keyword) { renderList(data); return; }
-
     const filtered = data.filter(item => {
+        // ① 연도 조건: 드롭다운에서 연도를 골랐는데, 글의 날짜가 그 연도가 아니면 제외
+        if (selectedYear && (!item.date || item.date.substring(0, 4) !== selectedYear)) {
+            return false;
+        }
+        // ② 월 조건: 드롭다운에서 월을 골랐는데, 글의 날짜가 그 월이 아니면 제외
+        if (selectedMonth && (!item.date || item.date.substring(5, 7) !== selectedMonth)) {
+            return false;
+        }
+        // ③ 검색어 조건: 검색어가 없으면 통과, 있으면 제목/요약/날짜/태그 중 하나라도 포함해야 함
+        if (!keyword) return true;
         const title = (item.title || '').toLowerCase();
         const summary = (item.summary || '').toLowerCase();
         const date = (item.date || '').toLowerCase();
