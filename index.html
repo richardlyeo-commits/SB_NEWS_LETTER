@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 화면 상단 탭에 표시되는 제목. 뒤의 버전번호(날짜-일련번호)는 파일을 수정할 때마다 올려주세요. -->
-    <title>삼영보영 주간 소식지 (20261004-02)</title>
+    <title>삼영보영 주간 소식지 (20261004-03)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -35,7 +35,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20261004-02</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20261004-03</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -111,13 +111,21 @@
 
     <!-- 소식지 전체 보기(라이트박스) 모달: 카드의 썸네일을 누르면 여기로 큰 이미지가 표시됩니다 -->
     <div id="viewerModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-3 z-[60]">
-        <button onclick="closeViewer()" class="absolute top-4 right-4 text-white/90 hover:text-white text-3xl leading-none z-10">✕</button>
-        <button id="viewerPrevBtn" onclick="viewerStep(-1)" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center text-2xl">‹</button>
-        <button id="viewerNextBtn" onclick="viewerStep(1)" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center text-2xl">›</button>
+        <button onclick="closeViewer()" class="absolute top-4 right-4 text-white text-3xl leading-none z-20 bg-black/50 w-9 h-9 rounded-full flex items-center justify-center">✕</button>
+        <!-- 이전/다음 쪽 화살표: 소식지가 흰 배경 사진이라 글자만 있으면 흰 이미지 위에서 안 보일 수 있어
+             항상 어두운 원 배경(bg-black/55)을 깔아 어떤 사진 위에서도 또렷하게 보이도록 했습니다. -->
+        <button id="viewerPrevBtn" onclick="viewerStep(-1)" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 text-white bg-black/55 hover:bg-black/75 rounded-full w-11 h-11 flex items-center justify-center text-2xl z-20 shadow-lg">‹</button>
+        <button id="viewerNextBtn" onclick="viewerStep(1)" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 text-white bg-black/55 hover:bg-black/75 rounded-full w-11 h-11 flex items-center justify-center text-2xl z-20 shadow-lg">›</button>
         <div class="max-w-3xl w-full max-h-[85vh] flex flex-col items-center gap-3">
             <div class="text-white/90 text-sm font-medium" id="viewerTitle"></div>
+            <!-- 폰에서는 화면을 손가락으로 좌우로 쓸어도(스와이프) 쪽이 넘어가도록 app.js에서 처리합니다. -->
             <img id="viewerImage" src="" class="max-h-[75vh] w-auto rounded-lg shadow-2xl bg-white">
             <div class="text-white/60 text-xs" id="viewerPageIndicator"></div>
+            <!-- 화살표가 작아 찾기 어려운 분들을 위해, 글자로 된 이전/다음 버튼도 아래에 추가로 둡니다. -->
+            <div id="viewerTextNav" class="hidden flex items-center gap-4 mt-1">
+                <button onclick="viewerStep(-1)" class="px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-lg">‹ 이전쪽</button>
+                <button onclick="viewerStep(1)" class="px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded-lg">다음쪽 ›</button>
+            </div>
         </div>
     </div>
 

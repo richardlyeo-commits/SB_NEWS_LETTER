@@ -1,5 +1,5 @@
 // ============================================================
-// app.js   (버전: 20261004-02)
+// app.js   (버전: 20261004-03)
 // 화면에 소식지/공지사항 목록을 불러와 카드로 보여주고,
 // 카드를 누르면 큰 이미지로 전체 내용을 볼 수 있게 해주는 파일입니다.
 // (컴퓨터를 잘 모르는 분도 이해할 수 있도록 각 부분에 설명을 달아두었습니다)
@@ -9,6 +9,9 @@
 // 검색창 글자 + 연도 + 월, 이 세 가지를 한꺼번에 따져서 목록을 걸러줍니다.
 // [2026-10-04 (02) 추가 수정] 검색창 + 연도/월 드롭다운을 화면에서 한 줄로 배치했고,
 // 관리자로 로그인했을 때 검색/연도/월 필터가 풀리던 문제를 고쳤습니다(admin.js 참고).
+// [2026-10-04 (03) 추가 수정] 소식지 큰 화면 보기에서, 흰색 소식지 사진 위에
+// 다음/이전 쪽 화살표가 묻혀 안 보이던 문제를 고쳤습니다(버튼을 항상 진하게 표시 +
+// 아래쪽에 글자 버튼 추가 + 폰에서 손가락으로 쓸어넘기는 기능 추가).
 // ============================================================
 
 let newslettersData = [];   // 주간 소식지 목록을 저장해 둘 배열
@@ -223,10 +226,13 @@ function updateViewerImage() {
     img.src = viewerList[viewerIndex] || '';
     indicator.innerText = viewerList.length > 1 ? `${viewerIndex + 1} / ${viewerList.length} 쪽` : '';
 
-    // 쪽이 1개뿐이면 화살표 버튼은 숨깁니다.
+    // 쪽이 1개뿐이면 화살표 버튼과 글자 버튼 모두 숨깁니다.
     const showArrows = viewerList.length > 1;
     document.getElementById('viewerPrevBtn').classList.toggle('hidden', !showArrows);
     document.getElementById('viewerNextBtn').classList.toggle('hidden', !showArrows);
+    const textNav = document.getElementById('viewerTextNav');
+    textNav.classList.toggle('hidden', !showArrows);
+    textNav.classList.toggle('flex', showArrows);
 }
 
 // 이전/다음 쪽으로 이동 (direction: -1 이전, 1 다음)
@@ -251,6 +257,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'ArrowLeft') viewerStep(-1);
         if (e.key === 'ArrowRight') viewerStep(1);
     });
+
+    // [2026-10-04 추가] 휴대폰에서 손가락으로 사진을 좌우로 쓸어넘기면(스와이프)
+    // 다음/이전 쪽으로 넘어가게 합니다. 화살표 버튼을 찾기 어려운 분도 쉽게 쓸 수 있습니다.
+    const viewerImg = document.getElementById('viewerImage');
+    let touchStartX = 0;
+    viewerImg.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX; // 손가락을 처음 댄 위치(가로)
+    }, { passive: true });
+    viewerImg.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX; // 손가락을 뗀 위치(가로)
+        const diff = touchEndX - touchStartX;
+        const SWIPE_MIN_DISTANCE = 40; // 이 거리(px) 이상 움직여야 '쓸어넘김'으로 인정
+        if (Math.abs(diff) < SWIPE_MIN_DISTANCE) return; // 살짝 터치한 건 무시
+        if (diff < 0) viewerStep(1);   // 오른쪽 -> 왼쪽으로 쓸면: 다음 쪽
+        else viewerStep(-1);           // 왼쪽 -> 오른쪽으로 쓸면: 이전 쪽
+    }, { passive: true });
 });
 
 // ---------------- 날짜/태그/검색 관련 보조 함수 ----------------
