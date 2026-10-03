@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 화면 상단 탭에 표시되는 제목. 뒤의 버전번호(날짜-일련번호)는 파일을 수정할 때마다 올려주세요. -->
-    <title>삼영보영 주간 소식지 (20261004-01)</title>
+    <title>삼영보영 주간 소식지 (20261004-02)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
@@ -35,7 +35,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl md:text-3xl font-bold">삼영보영 주간 소식지</h1>
-                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20261004-01</span>
+                        <span class="bg-emerald-800 text-emerald-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-600">20261004-02</span>
                     </div>
                     <p class="text-green-100 text-sm mt-1">시민을 위한 봉사하는 자세, 삼영·보영운수</p>
                 </div>
@@ -74,20 +74,21 @@
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4 shadow-sm">
-            <!-- 검색창: 날짜/제목/내용으로 글자 검색 -->
-            <div class="relative mb-3">
-                <input type="text" id="searchInput" placeholder="날짜, 제목, 내용으로 검색하세요..." class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
-                <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-            <!-- 연도/월 드롭다운: 쌓인 글이 많아져도 원하는 시기만 골라볼 수 있게 함.
-                 옵션 목록은 app.js에서 실제 데이터를 보고 자동으로 채워줍니다. -->
-            <div class="flex gap-2">
-                <select id="yearFilter" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
+            <!-- 검색창 + 연도/월 드롭다운을 한 줄에 배치.
+                 화면이 좁아지면(휴대폰 등) 자동으로 아래 줄로 넘어갑니다(flex-wrap). -->
+            <div class="flex flex-wrap gap-2">
+                <div class="relative flex-1 min-w-[180px]">
+                    <input type="text" id="searchInput" placeholder="날짜, 제목, 내용으로 검색하세요..." class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
+                    <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <!-- 연도/월 드롭다운: 쌓인 글이 많아져도 원하는 시기만 골라볼 수 있게 함.
+                     옵션 목록은 app.js에서 실제 데이터를 보고 자동으로 채워줍니다. -->
+                <select id="yearFilter" class="w-[110px] border border-slate-300 rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
                     <option value="">전체 연도</option>
                 </select>
-                <select id="monthFilter" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
+                <select id="monthFilter" class="w-[95px] border border-slate-300 rounded-lg p-2.5 text-sm bg-white focus:outline-none focus:border-[#01794c] focus:ring-2 focus:ring-[#01794c]/20">
                     <option value="">전체 월</option>
                 </select>
             </div>
