@@ -1,5 +1,5 @@
 // ============================================================
-// admin.js   (버전: 20261004-02)
+// admin.js   (버전: 20261113-01)
 // 관리자가 로그인해서 글을 올리고(작성) / 고치고(수정) / 지우는(삭제) 기능을 담당합니다.
 // 파일을 PDF나 사진으로 선택하면, 자동으로 "작은 미리보기 사진(썸네일)"과
 // "화면에서 크게 볼 수 있는 사진들"을 만들어서 GitHub 저장소에 올려줍니다.
@@ -8,6 +8,11 @@
 //
 // [2026-10-04 수정] 관리자로 로그인하는 순간 검색/연도/월 필터가 풀리고
 // 전체 목록이 다시 보이던 문제를 고쳤습니다. (handleAuthSubmit 함수 참고)
+//
+// [2026-11-13 수정] 저장했는데 "GitHub 토큰이 설정되지 않았습니다" 오류가 뜨는 경우,
+// 예전에는 모달을 닫고 로그아웃 후 다시 로그인해서 토큰을 넣어야 했습니다.
+// 이제는 글쓰기(업로드) 창 맨 아래 ⑥번 칸에 토큰을 바로 넣고 저장할 수 있습니다.
+// (handleFormSubmit 함수 맨 윗부분 참고)
 // ============================================================
 
 const ADMIN_PASSWORD = "6666";           // 관리자 비밀번호
@@ -285,9 +290,16 @@ function shrinkDataUrl(dataUrl, maxWidth, quality) {
 async function handleFormSubmit(e) {
     e.preventDefault();
 
+    // [2026-11-13 추가] 업로드 창 맨 아래 ⑥번 "GitHub 토큰" 칸에 뭔가 입력되어 있으면
+    // 그것을 먼저 브라우저에 저장합니다. (평소엔 이 칸이 비어있어서 아무 일도 안 일어남)
+    const tokenFromForm = document.getElementById('uploadGithubToken').value.trim();
+    if (tokenFromForm) {
+        localStorage.setItem('sb_gh_token', tokenFromForm);
+    }
+
     const token = localStorage.getItem('sb_gh_token');
     if (!token) {
-        alert("GitHub 토큰이 설정되지 않았습니다. 관리자 인증 시 토큰을 입력해 주세요.");
+        alert("GitHub 토큰이 설정되지 않았습니다. 바로 아래 '⑥ GitHub 토큰' 칸에 입력한 뒤 다시 '저장하기'를 눌러주세요.");
         return;
     }
 
