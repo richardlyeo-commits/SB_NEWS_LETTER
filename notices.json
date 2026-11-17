@@ -129,5 +129,16 @@
     "pages_images": [
       "pages/notice_0728_1.jpg"
     ]
+  },
+  {
+    "id": "1794898316804",
+    "date": "2020-12-11",
+    "title": "2020년 12월 11일자 공지",
+    "summary": "",
+    "tags": [],
+    "thumbnail": "./thumbs/1794898312574.jpg",
+    "pages_images": [
+      "./pages/1794898312574_1.jpg"
+    ]
   }
 ]
